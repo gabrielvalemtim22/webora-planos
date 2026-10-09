@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://webora-planos.vercel.app/sitemap.xml
