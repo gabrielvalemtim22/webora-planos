@@ -1,10 +1,12 @@
-/* Webora — página de planos e contratação */
+/* Webora — página de projetos, planos e contratação */
 (() => {
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const W = window.WEBORA, PLANOS = window.PLANOS, C = window.Contrato;
+  const LISTA = Object.values(PLANOS), PROJETOS = window.PROJETOS || [];
+  const TOP = (LISTA.find(P => P.destaque) || LISTA[0]).id;
   const wa = (text, num = W.whatsapp) => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
@@ -16,35 +18,84 @@
   $$('[data-wa]').forEach(a => { a.href = wa(a.dataset.wa); });
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
 
-  /* ---------- header ---------- */
+  /* ---------- header e menu do celular ---------- */
   const header = $('[data-header]');
   const onScroll = () => header.classList.toggle('is-scrolled', scrollY > 20);
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+  const menuBtn = $('[data-menu]');
+  const setMenu = open => {
+    header.classList.toggle('is-open', open);
+    menuBtn.setAttribute('aria-expanded', open);
+    menuBtn.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+    $('use', menuBtn).setAttribute('href', open ? '#i-x' : '#i-menu');
+  };
+  menuBtn.addEventListener('click', () => setMenu(!header.classList.contains('is-open')));
+  $$('.nav a', header).forEach(a => a.addEventListener('click', () => setMenu(false)));
+  addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
 
-  /* ---------- planos, comparação e opções do assistente ---------- */
-  const plansEl = $('[data-plans]');
-  plansEl.innerHTML = Object.values(PLANOS).map(P => {
-    const [int, dec] = P.valor.toFixed(2).split('.');
-    const pro = P.id === 'pro';
-    return `<article class="plan${pro ? ' plan--pro' : ''}" data-reveal${pro ? ' style="--d:.1s"' : ''}>
-      <span class="plan__badge">${pro ? '★ ' : ''}${P.selo}</span>
-      <h3 class="plan__name">${P.nome}</h3>
-      <p class="plan__tagline">${P.chamada}</p>
-      <p class="plan__price"><small>R$</small><b>${int}</b>${dec !== '00' ? `<sup>,${dec}</sup>` : ''}</p>
-      <p class="plan__terms">Pagamento único · à vista no Pix ou 50% + 50%</p>
-      <ul class="plan__list">${P.destaques.map(d => /:$/.test(d) ? `<li class="is-head">${d}</li>` : `<li><svg class="i"><use href="#i-check"/></svg>${d}</li>`).join('')}</ul>
-      <a class="btn ${pro ? 'btn--lime' : 'btn--ghost'} btn--lg" href="#contratar" data-choose="${P.id}">Escolher o ${P.nome}</a>
+  /* ---------- números do topo ---------- */
+  const rapido = LISTA.reduce((a, b) => (b.prazo < a.prazo ? b : a));
+  $$('[data-stat="projetos"]').forEach(el => { el.textContent = PROJETOS.length; });
+  $$('[data-stat="prazo"]').forEach(el => { el.textContent = rapido.prazo; });
+  $$('[data-stat="prazo-plano"]').forEach(el => { el.textContent = rapido.nome; });
+
+  /* ---------- projetos ---------- */
+  const browser = (p, eager) => `<figure class="browser">
+        <div class="browser__bar"><i></i><i></i><i></i><span class="browser__url">${p.dominio}</span></div>
+        <img src="${p.imagem}" alt="Página inicial do site ${p.nome}" width="1280" height="800"${eager ? '' : ' loading="lazy"'}>
+      </figure>`;
+  $('[data-work]').innerHTML = PROJETOS.map((p, i) => {
+    const P = PLANOS[p.plano], feature = i === 0;
+    return `<article class="case${feature ? ' case--feature' : ''}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 2) * .08}s"`}>
+      <a class="case__media" href="${p.url}" target="_blank" rel="noopener" aria-label="Abrir o site ${p.nome} em nova aba">
+        ${browser(p)}
+        ${feature && p.imagemCelular ? `<figure class="phone"><img src="${p.imagemCelular}" alt="" width="450" height="900" loading="lazy"></figure>` : ''}
+      </a>
+      <div class="case__body">
+        <p class="case__tag">${p.tipo}</p>
+        <h3 class="case__name">${p.nome}</h3>
+        <p class="case__seg">${p.segmento}</p>
+        <p class="case__desc">${p.descricao}</p>
+        <ul class="case__feats">${p.recursos.map(r => `<li>${r}</li>`).join('')}</ul>
+        <div class="case__foot">
+          <a class="case__link" href="${p.url}" target="_blank" rel="noopener">Ver site no ar <svg class="i"><use href="#i-ext"/></svg></a>
+          ${P ? `<a class="case__plan" href="#planos" data-choose="${P.id}">Plano indicado: <b>${P.nome}</b></a>` : ''}
+        </div>
+      </div>
     </article>`;
   }).join('');
 
-  $$('[data-price]').forEach(el => { el.textContent = C.brl(PLANOS[el.dataset.price].valor); });
+  /* ---------- planos, comparação e opções do assistente ---------- */
+  $('[data-plans]').innerHTML = LISTA.map((P, i) => {
+    const [int, dec] = P.valor.toFixed(2).split('.');
+    const top = P.id === TOP;
+    return `<article class="plan${top ? ' plan--top' : ''}" data-reveal style="--d:${i * .08}s">
+      <span class="plan__badge">${P.selo}</span>
+      <h3 class="plan__name">${P.nome}</h3>
+      <p class="plan__tagline">${P.chamada}</p>
+      <p class="plan__price"><small>R$</small><b>${Number(int).toLocaleString('pt-BR')}</b>${dec !== '00' ? `<sup>,${dec}</sup>` : ''}</p>
+      <p class="plan__terms">Pagamento único · Pix à vista ou 50% + 50%</p>
+      <a class="btn ${top ? 'btn--white' : 'btn--dark'} btn--lg" href="#contratar" data-choose="${P.id}">Escolher ${P.artigo} ${P.nome}</a>
+      <ul class="plan__list">${P.destaques.map(d => /:$/.test(d) ? `<li class="is-head">${d}</li>` : `<li><svg class="i"><use href="#i-check"/></svg>${d}</li>`).join('')}</ul>
+      <dl class="plan__meta">
+        <div><dt>Entrega</dt><dd>${P.prazo} dias úteis</dd></div>
+        <div><dt>Revisões</dt><dd>${P.revisoes} rodadas</dd></div>
+        <div><dt>Suporte</dt><dd>${P.suporte} dias</dd></div>
+      </dl>
+      <p class="plan__ideal"><b>Ideal para:</b> ${P.ideal}.</p>
+    </article>`;
+  }).join('');
+
   const cell = v => v === true ? '<span class="yes" aria-label="Incluído"><svg class="i"><use href="#i-check"/></svg></span>'
     : v === false ? '<span class="no" aria-label="Não incluído"><svg class="i"><use href="#i-x"/></svg></span>' : v;
-  $('[data-compare]').innerHTML = window.COMPARATIVO.map(([item, e, p]) => `<tr><td>${item}</td><td>${cell(e)}</td><td>${cell(p)}</td></tr>`).join('');
+  const topCls = i => (LISTA[i] && LISTA[i].id === TOP ? ' class="is-top"' : '');
+  $('[data-compare-head]').innerHTML = `<tr><th scope="col">Recurso</th>${LISTA.map((P, i) => `<th scope="col"${topCls(i)}>${P.nome}<small>${C.brl(P.valor)}</small></th>`).join('')}</tr>`;
+  $('[data-compare]').innerHTML = window.COMPARATIVO.map(([item, ...vals]) => `<tr><th scope="row">${item}</th>${vals.map((v, i) => `<td${topCls(i)}>${cell(v)}</td>`).join('')}</tr>`).join('');
 
-  $('[data-pick]').innerHTML = Object.values(PLANOS).map((P, i) => `<label class="pick__opt">
-      <input type="radio" name="plano" value="${P.id}"${i === 1 ? ' checked' : ''}>
+  $('[data-pick]').innerHTML = LISTA.map(P => `<label class="pick__opt">
+      <input type="radio" name="plano" value="${P.id}"${P.id === TOP ? ' checked' : ''}>
       <span class="pick__card"><b>${P.nome}</b><em>${C.brl(P.valor)}</em><small>${P.chamada}</small></span>
     </label>`).join('');
 
@@ -85,7 +136,7 @@
     if (n === 3) requestAnimationFrame(sizePad);
   }
 
-  // escolher plano pelos cards
+  // escolher plano pelos cards (planos e projetos)
   $$('[data-choose]').forEach(a => a.addEventListener('click', () => {
     $(`input[name="plano"][value="${a.dataset.choose}"]`, wiz).checked = true;
     updatePlanUI(); saveDraft();
@@ -291,7 +342,7 @@
     const x = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
     const badge = $('.done__badge', wiz).getBoundingClientRect();
     const ox = badge.left + badge.width / 2, oy = badge.top + badge.height / 2;
-    const parts = Array.from({ length: 110 }, () => ({ x: ox, y: oy, vx: (Math.random() - .5) * 14, vy: Math.random() * -13 - 3, s: Math.random() * 7 + 3, r: Math.random() * 6, c: Math.random() < .7 ? '#9ffa08' : '#ffffff' }));
+    const parts = Array.from({ length: 110 }, () => ({ x: ox, y: oy, vx: (Math.random() - .5) * 14, vy: Math.random() * -13 - 3, s: Math.random() * 7 + 3, r: Math.random() * 6, c: Math.random() < .6 ? '#2F6BFF' : '#ffffff' }));
     const t0 = performance.now();
     (function tick(t) {
       const k = (t - t0) / 1600;

@@ -149,7 +149,7 @@
     t('p', '3.5. Não estão incluídos custos de terceiros, como renovação do domínio após o período incluído, taxas de intermediadores de pagamento, anúncios pagos e planos pagos de hospedagem, salvo quando expressamente previstos no Anexo I.');
 
     t('h', '4. PRAZO DE ENTREGA');
-    t('p', `4.1. O site será entregue em até ${P.prazo} (${extenso(P.prazo).replace(/ reais?$/, '')}) dias úteis, contados a partir do último dos seguintes eventos: (a) confirmação do pagamento ou da entrada; (b) recebimento de todo o material necessário, como logotipo, textos, fotos e informações de contato${P.id === 'pro' ? ' e, para a loja online, a lista de produtos com fotos, descrições e preços' : ''}.`);
+    t('p', `4.1. O site será entregue em até ${P.prazo} (${extenso(P.prazo).replace(/ reais?$/, '')}) dias úteis, contados a partir do último dos seguintes eventos: (a) confirmação do pagamento ou da entrada; (b) recebimento de todo o material necessário, como logotipo, textos, fotos e informações de contato${P.loja ? ' e, para a loja online, a lista de produtos com fotos, descrições e preços' : ''}.`);
     t('p', '4.2. Atrasos no envio de material, de informações ou de aprovações pela CONTRATANTE prorrogam o prazo pelo mesmo período.');
     t('p', '4.3. Antes da publicação final, a CONTRATADA apresentará uma versão do site para aprovação da CONTRATANTE.');
 
@@ -175,7 +175,7 @@
     t('p', '8.3. O site será publicado em hospedagem em nuvem sem mensalidade para a CONTRATANTE, enquanto o uso permanecer dentro dos limites do plano gratuito do provedor. Se o volume de acessos ou os recursos exigirem um plano pago, os custos serão informados previamente e ficarão a cargo da CONTRATANTE.');
 
     t('h', '9. SUPORTE E MANUTENÇÃO');
-    t('p', `9.1. A CONTRATADA prestará suporte por ${P.suporte} (${extenso(P.suporte).replace(/ reais?$/, '')}) dias corridos após a entrega, para correção de falhas e pequenos ajustes de texto e imagem${P.id === 'pro' ? ', com atendimento prioritário' : ''}.`);
+    t('p', `9.1. A CONTRATADA prestará suporte por ${P.suporte} (${extenso(P.suporte).replace(/ reais?$/, '')}) dias corridos após a entrega, para correção de falhas e pequenos ajustes de texto e imagem${P.suportePrioritario ? ', com atendimento prioritário' : ''}.`);
     t('p', '9.2. Após esse período, manutenções e alterações serão orçadas à parte.');
 
     t('h', '10. PROPRIEDADE E PORTFÓLIO');
@@ -209,7 +209,7 @@
     t('li', `Quantidade de páginas: ${P.paginas}`);
     t('li', `Rodadas de revisão: ${P.revisoes}`);
     t('li', `Prazo de entrega: até ${P.prazo} dias úteis`);
-    t('li', `Suporte após a entrega: ${P.suporte} dias${P.id === 'pro' ? ', prioritário' : ''}`);
+    t('li', `Suporte após a entrega: ${P.suporte} dias${P.suportePrioritario ? ', prioritário' : ''}`);
     t('li', 'Domínio: 1 ano incluído');
     t('li', 'Hospedagem: em nuvem, sem mensalidade dentro dos limites do plano gratuito do provedor');
     if (d.obs) { t('p', 'Observações da CONTRATANTE sobre o projeto:'); t('p', d.obs); }
@@ -245,10 +245,9 @@
     const clean = s => String(s).replace(/[  ]/g, ' ').replace(/[–—]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[•✦✓]/g, '-');
     let y = M + 10;
     const head = () => {
-      doc.setFillColor(5, 5, 5); doc.rect(0, 0, PW, 14, 'F');
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 255, 255); doc.text('web', M, 9.4);
-      const w = doc.getTextWidth('web'); doc.setTextColor(159, 250, 8); doc.text('ora', M + w, 9.4);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(190, 190, 190);
+      doc.setFillColor(0, 82, 255); doc.rect(0, 0, PW, 14, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(255, 255, 255); doc.text('webora', M, 9.4);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(226, 234, 255);
       doc.text(clean(`Contrato nº ${c.numero}`), PW - M, 9.4, { align: 'right' });
       doc.setTextColor(20, 20, 20);
     };
