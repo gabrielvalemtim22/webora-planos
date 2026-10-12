@@ -36,10 +36,11 @@
   document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
 
   /* ---------- números do topo ---------- */
-  const rapido = LISTA.reduce((a, b) => (b.prazo < a.prazo ? b : a));
+  const prazos = LISTA.map(P => P.prazo), prazoMin = Math.min(...prazos), prazoMax = Math.max(...LISTA.map(P => P.prazoMax || P.prazo));
   $$('[data-stat="projetos"]').forEach(el => { el.textContent = PROJETOS.length; });
-  $$('[data-stat="prazo"]').forEach(el => { el.textContent = rapido.prazo; });
-  $$('[data-stat="prazo-plano"]').forEach(el => { el.textContent = rapido.nome; });
+  $$('[data-stat="prazo"]').forEach(el => { el.textContent = (Math.max(...prazos) > prazoMin ? 'a partir de ' : '') + C.dias(prazoMin); });
+  $$('[data-stat="prazo-max"]').forEach(el => { el.textContent = C.dias(prazoMax); });
+  $$('[data-prazo-extra]').forEach(el => { el.hidden = prazoMax <= prazoMin; });
 
   /* ---------- projetos ---------- */
   const browser = (p, eager) => `<figure class="browser">
@@ -80,7 +81,7 @@
       <a class="btn ${top ? 'btn--white' : 'btn--dark'} btn--lg" href="#contratar" data-choose="${P.id}">Escolher ${P.artigo} ${P.nome}</a>
       <ul class="plan__list">${P.destaques.map(d => /:$/.test(d) ? `<li class="is-head">${d}</li>` : `<li><svg class="i"><use href="#i-check"/></svg>${d}</li>`).join('')}</ul>
       <dl class="plan__meta">
-        <div><dt>Entrega</dt><dd>${P.prazo} dias úteis</dd></div>
+        <div><dt>Entrega</dt><dd>${C.dias(P.prazo)}</dd></div>
         <div><dt>Revisões</dt><dd>${P.revisoes} rodadas</dd></div>
         <div><dt>Suporte</dt><dd>${P.suporte} dias</dd></div>
       </dl>

@@ -21,10 +21,12 @@ window.WEBORA = {
     cidade: 'SAO PAULO'                // até 15 letras, sem acento
   },
   foro: 'São Paulo/SP',
-  versaoContrato: '3.0'
+  versaoContrato: '3.1'
 };
 
 /* Planos, na ordem em que aparecem no site.
+   prazo                     → dias úteis para a entrega
+   prazoMax                  → teto do prazo em alta demanda ou problemas técnicos (aparece no site e no contrato)
    destaque: true            → card em azul ("Recomendado") e opção já marcada na contratação
    loja: true                → o contrato pede a lista de produtos
    suportePrioritario: true  → o contrato cita atendimento prioritário */
@@ -65,7 +67,8 @@ window.PLANOS = {
     ],
     paginas: '1 página com até 6 seções',
     revisoes: 2,
-    prazo: 7,
+    prazo: 1,
+    prazoMax: 3,
     suporte: 30
   },
   profissional: {
@@ -104,7 +107,8 @@ window.PLANOS = {
     ],
     paginas: 'até 5 páginas',
     revisoes: 3,
-    prazo: 10,
+    prazo: 1,
+    prazoMax: 3,
     suporte: 60
   },
   loja: {
@@ -147,7 +151,8 @@ window.PLANOS = {
     ],
     paginas: 'até 8 páginas',
     revisoes: 4,
-    prazo: 15,
+    prazo: 1,
+    prazoMax: 3,
     suporte: 90
   }
 };
@@ -170,7 +175,7 @@ window.COMPARATIVO = [
   ['Produtos cadastrados', false, false, 'Até 30'],
   ['Vídeo comercial para Reels', false, false, true],
   ['Rodadas de revisão', '2', '3', '4'],
-  ['Prazo de entrega', 'Até 7 dias úteis', 'Até 10 dias úteis', 'Até 15 dias úteis'],
+  ['Prazo de entrega', '1 dia útil', '1 dia útil', '1 dia útil'],
   ['Suporte após a entrega', '30 dias', '60 dias', '90 dias, prioritário']
 ];
 

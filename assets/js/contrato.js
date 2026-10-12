@@ -7,6 +7,7 @@
   /* ---------- dinheiro e extenso ---------- */
   const brl = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const cents = v => Math.round(v * 100);
+  const dias = n => `${n} ${n === 1 ? 'dia útil' : 'dias úteis'}`;
 
   function extenso(v) {
     const u = ['zero', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove', 'dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
@@ -149,12 +150,16 @@
     t('p', '3.5. Não estão incluídos custos de terceiros, como renovação do domínio após o período incluído, taxas de intermediadores de pagamento, anúncios pagos e planos pagos de hospedagem, salvo quando expressamente previstos no Anexo I.');
 
     t('h', '4. PRAZO DE ENTREGA');
-    t('p', `4.1. O site será entregue em até ${P.prazo} (${extenso(P.prazo).replace(/ reais?$/, '')}) dias úteis, contados a partir do último dos seguintes eventos: (a) confirmação do pagamento ou da entrada; (b) recebimento de todo o material necessário, como logotipo, textos, fotos e informações de contato${P.loja ? ' e, para a loja online, a lista de produtos com fotos, descrições e preços' : ''}.`);
-    t('p', '4.2. Atrasos no envio de material, de informações ou de aprovações pela CONTRATANTE prorrogam o prazo pelo mesmo período.');
-    t('p', '4.3. Antes da publicação final, a CONTRATADA apresentará uma versão do site para aprovação da CONTRATANTE.');
+    const num = n => extenso(n).replace(/ rea(l|is)$/, '');
+    const prazoMax = P.prazoMax > P.prazo ? P.prazoMax : 0;
+    let c4 = 2;
+    t('p', `4.1. O site será entregue em até ${P.prazo} (${num(P.prazo)}) ${P.prazo === 1 ? 'dia útil, contado' : 'dias úteis, contados'} a partir do último dos seguintes eventos: (a) confirmação do pagamento ou da entrada; (b) recebimento de todo o material necessário, como logotipo, textos, fotos e informações de contato${P.loja ? ' e, para a loja online, a lista de produtos com fotos, descrições e preços' : ''}.`);
+    if (prazoMax) t('p', `4.${c4++}. Em períodos de alta demanda ou em caso de problemas técnicos, o prazo da cláusula 4.1 poderá ser de até ${prazoMax} (${num(prazoMax)}) dias úteis, contados da mesma forma, e a CONTRATADA avisará a CONTRATANTE pelo WhatsApp.`);
+    t('p', `4.${c4++}. Atrasos no envio de material, de informações ou de aprovações pela CONTRATANTE prorrogam o prazo pelo mesmo período.`);
+    t('p', `4.${c4++}. Antes da publicação final, a CONTRATADA apresentará uma versão do site para aprovação da CONTRATANTE.`);
 
     t('h', '5. REVISÕES');
-    t('p', `5.1. Estão incluídas ${P.revisoes} (${extenso(P.revisoes).replace(/ reais?$/, '').replace(/^um$/, 'uma').replace(/^dois$/, 'duas')}) rodadas de revisão sobre a versão apresentada. Cada rodada corresponde a uma lista única de ajustes enviada pela CONTRATANTE.`);
+    t('p', `5.1. Estão incluídas ${P.revisoes} (${extenso(P.revisoes).replace(/ rea(l|is)$/, '').replace(/^um$/, 'uma').replace(/^dois$/, 'duas')}) rodadas de revisão sobre a versão apresentada. Cada rodada corresponde a uma lista única de ajustes enviada pela CONTRATANTE.`);
     t('p', '5.2. Alterações que mudem o escopo contratado, como novas páginas, novas funcionalidades ou a troca completa do layout após a aprovação, serão orçadas à parte.');
 
     t('h', '6. OBRIGAÇÕES DA CONTRATADA');
@@ -175,7 +180,7 @@
     t('p', '8.3. O site será publicado em hospedagem em nuvem sem mensalidade para a CONTRATANTE, enquanto o uso permanecer dentro dos limites do plano gratuito do provedor. Se o volume de acessos ou os recursos exigirem um plano pago, os custos serão informados previamente e ficarão a cargo da CONTRATANTE.');
 
     t('h', '9. SUPORTE E MANUTENÇÃO');
-    t('p', `9.1. A CONTRATADA prestará suporte por ${P.suporte} (${extenso(P.suporte).replace(/ reais?$/, '')}) dias corridos após a entrega, para correção de falhas e pequenos ajustes de texto e imagem${P.suportePrioritario ? ', com atendimento prioritário' : ''}.`);
+    t('p', `9.1. A CONTRATADA prestará suporte por ${P.suporte} (${extenso(P.suporte).replace(/ rea(l|is)$/, '')}) dias corridos após a entrega, para correção de falhas e pequenos ajustes de texto e imagem${P.suportePrioritario ? ', com atendimento prioritário' : ''}.`);
     t('p', '9.2. Após esse período, manutenções e alterações serão orçadas à parte.');
 
     t('h', '10. PROPRIEDADE E PORTFÓLIO');
@@ -208,7 +213,7 @@
     t('p', 'Escopo:');
     t('li', `Quantidade de páginas: ${P.paginas}`);
     t('li', `Rodadas de revisão: ${P.revisoes}`);
-    t('li', `Prazo de entrega: até ${P.prazo} dias úteis`);
+    t('li', `Prazo de entrega: até ${dias(P.prazo)}${prazoMax ? `, ou até ${dias(prazoMax)} em períodos de alta demanda ou em caso de problemas técnicos` : ''}`);
     t('li', `Suporte após a entrega: ${P.suporte} dias${P.suportePrioritario ? ', prioritário' : ''}`);
     t('li', 'Domínio: 1 ano incluído');
     t('li', 'Hospedagem: em nuvem, sem mensalidade dentro dos limites do plano gratuito do provedor');
@@ -326,5 +331,5 @@
     return doc;
   }
 
-  window.Contrato = { brl, extenso, validCPF, validCNPJ, maskDoc, maskPhone, digits, pixPayload, crc16, dataLonga, dataHora, numeroContrato, sha256, condicoes, build, toText, renderHTML, pdf };
+  window.Contrato = { brl, dias, extenso, validCPF, validCNPJ, maskDoc, maskPhone, digits, pixPayload, crc16, dataLonga, dataHora, numeroContrato, sha256, condicoes, build, toText, renderHTML, pdf };
 })();

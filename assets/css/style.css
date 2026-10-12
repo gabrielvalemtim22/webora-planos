@@ -246,6 +246,7 @@ ul, ol { padding: 0; list-style: none; }
 .plan__ideal { margin-top: 16px; color: var(--muted); font-size: 13.5px; }
 .plan__ideal b { color: var(--text); font-weight: 600; }
 .plans__note { text-align: center; color: var(--muted); font-size: 14.5px; margin-top: 44px; }
+.plans__note--sub { margin-top: 8px; }
 
 /* ---------- comparar ---------- */
 .compare { max-width: 1040px; margin-inline: auto; overflow-x: auto; border-radius: 22px; border: 1px solid var(--line); background: var(--surface); }
@@ -262,6 +263,7 @@ ul, ol { padding: 0; list-style: none; }
 .compare .yes { background: var(--blue); color: #fff; }
 .compare .no { background: var(--surface-2); color: #8A93A8; }
 .compare .yes .i, .compare .no .i { font-size: 15px; }
+.compare__note { max-width: 1040px; margin: 18px auto 0; text-align: center; color: var(--muted); font-size: 14px; }
 
 /* ---------- steps ---------- */
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
