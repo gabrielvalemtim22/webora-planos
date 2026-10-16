@@ -223,29 +223,29 @@ window.PROJETOS = [
     imagemCelular: 'assets/img/projetos/gvclean-m.webp'
   },
   {
-    id: 'pointsantana',
-    nome: 'Point Santana',
-    tipo: 'Site de restaurante',
-    segmento: 'Restaurante e pizzaria · Santana, São Paulo',
-    url: 'https://point-santana-site.vercel.app/',
-    dominio: 'point-santana-site.vercel.app',
-    plano: 'profissional',
-    descricao: 'Site de restaurante com cardápio completo, fotos do espaço, avaliações de clientes e pedido pelo WhatsApp.',
-    recursos: ['Cardápio completo', 'Avaliações', 'Pedido pelo WhatsApp'],
-    imagem: 'assets/img/projetos/pointsantana.webp',
-    imagemCelular: 'assets/img/projetos/pointsantana-m.webp'
+    id: 'oficinakeke',
+    nome: 'Oficina Mecânica Keke',
+    tipo: 'Site de oficina',
+    segmento: 'Oficina mecânica · Revisão, motor, freios e suspensão',
+    url: 'https://oficina-keke.vercel.app/',
+    dominio: 'oficina-keke.vercel.app',
+    plano: 'essencial',
+    descricao: 'Site de uma página para oficina mecânica, com serviços, banners de destaque, passo a passo do atendimento, dúvidas frequentes e orçamento direto pelo WhatsApp.',
+    recursos: ['Serviços', 'Banners de destaque', 'Orçamento pelo WhatsApp'],
+    imagem: 'assets/img/projetos/oficinakeke.webp',
+    imagemCelular: 'assets/img/projetos/oficinakeke-m.webp'
   },
   {
-    id: 'divasbags',
-    nome: 'Divas Bags Eco',
-    tipo: 'Loja online',
-    segmento: 'Bolsas e moda feminina',
-    url: 'https://divasbagseco.vercel.app/',
-    dominio: 'divasbagseco.vercel.app',
-    plano: 'loja',
-    descricao: 'Loja de bolsas, roupas e acessórios femininos, com categorias, vitrine de novidades, favoritos e sacola de compras.',
-    recursos: ['Categorias e novidades', 'Favoritos e sacola', 'Acompanhamento de pedido'],
-    imagem: 'assets/img/projetos/divasbags.webp',
-    imagemCelular: 'assets/img/projetos/divasbags-m.webp'
+    id: 'sulintech',
+    nome: 'Sulin Tech',
+    tipo: 'Site de assistência técnica',
+    segmento: 'Celulares, notebooks e videogames · Cidade Tiradentes, São Paulo',
+    url: 'https://sulin-tech.vercel.app/',
+    dominio: 'sulin-tech.vercel.app',
+    plano: 'profissional',
+    descricao: 'Site de assistência técnica com serviços filtrados por aparelho, pedido de orçamento que chega pronto no WhatsApp da loja, dúvidas frequentes e mapa.',
+    recursos: ['Serviços por aparelho', 'Orçamento pelo WhatsApp', 'Mapa e contato'],
+    imagem: 'assets/img/projetos/sulintech.webp',
+    imagemCelular: 'assets/img/projetos/sulintech-m.webp'
   }
 ];
