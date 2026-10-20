@@ -244,8 +244,8 @@
   ];
 
   /* Portfólio. O primeiro projeto aparece em destaque (card grande).
-     Para adicionar um projeto: salve um print de 1280×800 em assets/img/projetos/
-     e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido. */
+     Para adicionar um projeto: rode `npm run print -- <url> <id>` (gera os prints em
+     assets/img/projetos/) e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido. */
   const PROJETOS = [
     {
       id: 'kivora',
@@ -267,24 +267,11 @@
       segmento: 'Comunicação visual · São Paulo',
       url: 'https://www.jesusnewjob.com.br/',
       dominio: 'jesusnewjob.com.br',
-      plano: 'premium',
+      plano: 'essencial',
       descricao: 'Site institucional para empresa de comunicação visual, com serviços, galeria de projetos, bastidores e pedido de orçamento.',
       recursos: ['Galeria de projetos', 'Bastidores', 'Pedido de orçamento'],
       imagem: '/assets/img/projetos/jesusnewjob.webp',
       imagemCelular: '/assets/img/projetos/jesusnewjob-m.webp'
-    },
-    {
-      id: 'gvclean',
-      nome: 'GVClean',
-      tipo: 'Site de serviços',
-      segmento: 'Higienização de estofados · São Paulo',
-      url: 'https://gvclean.vercel.app/',
-      dominio: 'gvclean.vercel.app',
-      plano: 'essencial',
-      descricao: 'Site de serviços com tabela de valores, antes e depois interativo e orçamento direto pelo WhatsApp.',
-      recursos: ['Tabela de valores', 'Antes e depois interativo', 'Orçamento pelo WhatsApp'],
-      imagem: '/assets/img/projetos/gvclean.webp',
-      imagemCelular: '/assets/img/projetos/gvclean-m.webp'
     },
     {
       id: 'oficinakeke',
@@ -300,17 +287,17 @@
       imagemCelular: '/assets/img/projetos/oficinakeke-m.webp'
     },
     {
-      id: 'sulintech',
-      nome: 'Sulin Tech',
-      tipo: 'Site de assistência técnica',
-      segmento: 'Celulares, notebooks e videogames · Cidade Tiradentes, São Paulo',
-      url: 'https://sulin-tech.vercel.app/',
-      dominio: 'sulin-tech.vercel.app',
+      id: 'conectagoogle',
+      nome: 'Conecta Google',
+      tipo: 'Site de serviços',
+      segmento: 'Google Meu Negócio e plaquinhas NFC',
+      url: 'https://conectagoogle.vercel.app/',
+      dominio: 'conectagoogle.vercel.app',
       plano: 'essencial',
-      descricao: 'Site de assistência técnica com serviços filtrados por aparelho, pedido de orçamento que chega pronto no WhatsApp da loja, dúvidas frequentes e mapa.',
-      recursos: ['Serviços por aparelho', 'Orçamento pelo WhatsApp', 'Mapa e contato'],
-      imagem: '/assets/img/projetos/sulintech.webp',
-      imagemCelular: '/assets/img/projetos/sulintech-m.webp'
+      descricao: 'Site para quem implanta e atualiza o Google Meu Negócio e vende plaquinhas NFC, com os serviços, os dois tamanhos de plaquinha e um personalizador para o cliente montar a sua.',
+      recursos: ['Gestão no Google', 'Plaquinhas NFC', 'Personalizador'],
+      imagem: '/assets/img/projetos/conectagoogle.webp',
+      imagemCelular: '/assets/img/projetos/conectagoogle-m.webp'
     }
   ];
 

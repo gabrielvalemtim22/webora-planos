@@ -7,59 +7,16 @@
      favicon.ico, icon.png, icon-192.png, icon-maskable.png, apple-icon.png   (raiz do site)
      assets/img/og.jpg   imagem de compartilhamento (1200×630), a partir de scripts/og.html
 
-   Usa o Chrome (ou Edge) instalado, sem dependências: node scripts/marca.mjs
-   Para outro navegador: CHROME="/caminho/do/navegador" node scripts/marca.mjs
+   Usa o Chrome (ou Edge) instalado, sem dependências: npm run marca
    ========================================================= */
-import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { readFile, writeFile, mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { launch } from './chrome.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const NEON = [0x9B, 0xFF, 0x00];
 const BLACK = [0x08, 0x08, 0x08];
-const CHROME = process.env.CHROME || [
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser'
-].find(p => existsSync(p));
-
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-/* ---------- Chrome via DevTools Protocol ---------- */
-async function launch() {
-  if (!CHROME) throw new Error('Chrome não encontrado. Defina CHROME com o caminho do navegador.');
-  const dir = await mkdtemp(path.join(tmpdir(), 'webora-marca-'));
-  const port = 9300 + Math.floor(Math.random() * 600);
-  const proc = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${dir}`,
-    '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--allow-file-access-from-files', 'about:blank'], { stdio: 'ignore' });
-  let target;
-  for (let i = 0; i < 80 && !target; i++) {
-    try { target = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find(t => t.type === 'page'); } catch (e) { /* ainda abrindo */ }
-    if (!target) await sleep(150);
-  }
-  if (!target) { proc.kill(); throw new Error('Não foi possível conectar ao Chrome.'); }
-  const ws = new WebSocket(target.webSocketDebuggerUrl);
-  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
-  let seq = 0;
-  const pending = new Map(), waiters = [];
-  ws.onmessage = ev => {
-    const m = JSON.parse(ev.data);
-    if (m.id && pending.has(m.id)) { const p = pending.get(m.id); pending.delete(m.id); m.error ? p.rej(new Error(m.error.message)) : p.res(m.result); }
-    else if (m.method) waiters.filter(w => w.method === m.method).forEach(w => { waiters.splice(waiters.indexOf(w), 1); w.res(m.params); });
-  };
-  const send = (method, params = {}) => new Promise((res, rej) => { const id = ++seq; pending.set(id, { res, rej }); ws.send(JSON.stringify({ id, method, params })); });
-  const once = method => new Promise(res => waiters.push({ method, res }));
-  const evaluate = async (fn, arg) => {
-    const r = await send('Runtime.evaluate', { expression: `(${fn})(${JSON.stringify(arg)})`, awaitPromise: true, returnByValue: true });
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
-    return r.result.value;
-  };
-  return { send, once, evaluate, close: async () => { ws.close(); proc.kill(); await sleep(300); await rm(dir, { recursive: true, force: true }).catch(() => {}); } };
-}
 
 /* ---------- processamento das imagens (roda dentro do Chrome) ---------- */
 async function processar({ simbolo, logotipo, neon, black }) {

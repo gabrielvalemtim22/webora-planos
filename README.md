@@ -21,9 +21,10 @@ Os valores são calculados em centavos. Quando o total tem centavo ímpar, a ent
 
 ### Adicionar um projeto
 
-1. Salve um print da página inicial em `assets/img/projetos/` (1280×800, `.webp`) e, se quiser, um do celular (450×900).
+1. Rode `npm run print -- <url do site> <id>`. Ele salva os prints em `assets/img/projetos/` (`<id>.webp`, 1280×800, e `<id>-m.webp`, 450×900 do celular).
 2. Copie um dos blocos de `PROJETOS` no `config.js` e troque nome, tipo, link, descrição e imagens.
 3. Em `plano`, coloque o id do plano indicado para um site parecido (`essencial`, `loja` ou `premium`).
+4. Atualize o número de projetos no `index.html` (`data-stat="projetos"`); o `npm test` avisa se esquecer.
 
 ## Estrutura
 
@@ -47,6 +48,7 @@ tests/                     testes (npm test)
 ```bash
 npm run dev     # http://localhost:3000, com a função /api/contrato
 npm test        # valores, contrato, Pix, consistência dos dados e API
+npm run print -- <url> <id>   # prints de um projeto para a vitrine
 npm run marca   # regenera logotipo, favicons e assets/img/og.jpg a partir de marca/ (usa o Chrome instalado)
 ```
 

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "test": "node --test tests/*.test.mjs",
-    "marca": "node scripts/marca.mjs"
+    "marca": "node scripts/marca.mjs",
+    "print": "node scripts/print-projeto.mjs"
   }
 }

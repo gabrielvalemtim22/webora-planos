@@ -100,6 +100,13 @@ test('tabela comparativa e projetos batem com os planos', () => {
   assert.equal(ids.size, PROJETOS.length);
 });
 
+test('prints dos projetos e do topo existem', async () => {
+  const html = await read('index.html');
+  const usados = [...PROJETOS.flatMap(p => [p.imagem, p.imagemCelular]), ...[...html.matchAll(/src="(\/assets\/img\/projetos\/[^"]+)"/g)].map(m => m[1])];
+  for (const src of usados) await assert.doesNotReject(readFile(path.join(ROOT, src)), src);
+  assert.ok(html.includes(`<span data-stat="projetos">${PROJETOS.length}</span>`), 'número de projetos no topo');
+});
+
 test('textos estáticos do index.html acompanham config.js', async () => {
   const html = await read('index.html');
   const desc = html.match(/<meta name="description" content="([^"]+)"/)[1];

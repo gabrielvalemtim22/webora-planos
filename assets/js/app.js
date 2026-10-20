@@ -82,9 +82,12 @@
         <div class="browser__bar"><i></i><i></i><i></i><span>${esc(p.dominio)}</span></div>
         <img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)}" width="1280" height="800" decoding="async"${eager ? '' : ' loading="lazy"'}>
       </figure>`;
+  // abaixo do destaque, cards em linhas de 3 quando em 2 colunas sobraria um sozinho
+  const resto = PROJETOS.length - 1;
+  $('[data-work]').classList.toggle('work--3', resto % 2 === 1 && resto % 3 === 0);
   $('[data-work]').innerHTML = PROJETOS.map((p, i) => {
     const P = PLANOS[p.plano], feature = i === 0;
-    return `<article class="case${feature ? ' case--feature' : ''}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 2) * .08}s"`}>
+    return `<article class="case${feature ? ' case--feature' : ''}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 3) * .08}s"`}>
       <a class="case__media" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Abrir o site ${esc(p.nome)} em nova aba">
         ${browser(p)}
         ${feature && p.imagemCelular ? `<figure class="device"><img src="${esc(p.imagemCelular)}" alt="" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
