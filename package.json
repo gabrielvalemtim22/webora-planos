@@ -1,0 +1,10 @@
+{
+  "name": "webora-planos",
+  "private": true,
+  "description": "Webora: projetos, planos e contratação online (site estático + função de conferência na Vercel)",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "marca": "node scripts/marca.mjs"
+  }
+}

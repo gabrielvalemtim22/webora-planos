@@ -1,0 +1,6 @@
+# Ferramentas e originais que não precisam ir para o site publicado
+scripts/
+tests/
+marca/
+package.json
+.claude/

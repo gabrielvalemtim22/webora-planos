@@ -1,251 +1,318 @@
 /* =========================================================
    Webora — dados da empresa, dos planos e dos projetos
-   Edite aqui: preços, itens dos planos, prazos, contatos e portfólio.
-   Tudo no site e no contrato é gerado a partir deste arquivo.
-   (Se mudar os preços, atualize também a <meta name="description"> do index.html.)
+   FONTE ÚNICA: cards, tabela comparativa, contratação, contrato, PDF,
+   Pix e conferência no servidor (api/contrato.js) leem daqui.
+
+   Valores sempre em CENTAVOS (inteiros): R$ 999,99 → 99999.
+   Ao mudar um preço, rode `npm test`: ele aponta os textos estáticos do
+   index.html (descrição, dados estruturados) que precisam acompanhar.
    ========================================================= */
+(function (root, factory) {
+  const data = factory();
+  if (typeof module === 'object' && module.exports) module.exports = data;
+  else Object.assign(root, data);
+})(typeof self !== 'undefined' ? self : this, function () {
+  const SITE = {
+    url: 'https://www.weborasites.com.br',
+    nome: 'Webora'
+  };
 
-window.WEBORA = {
-  marca: 'Webora',
-  responsavel: 'Gabriel Valemtim Ribeiro Loriente Hernadez',
-  tipo: 'Microempreendedor Individual (MEI)',
-  documento: '63.371.209/0001-81',
-  endereco: 'Rua Muana, 240, São Paulo/SP',
-  whatsapp: '5511959304102',
-  whatsappFormatado: '(11) 95930-4102',
-  pix: {
-    chave: '+5511959304102',          // chave Pix (telefone no formato +55DDDNÚMERO)
-    chaveFormatada: '+55 (11) 95930-4102',
-    tipo: 'telefone',
-    nome: 'GABRIEL VALEMTIM RIBEIRO',  // até 25 letras, sem acento
-    cidade: 'SAO PAULO'                // até 15 letras, sem acento
-  },
-  foro: 'São Paulo/SP',
-  versaoContrato: '3.1'
-};
+  const WEBORA = {
+    marca: 'Webora',
+    responsavel: 'Gabriel Valemtim Ribeiro Loriente Hernadez',
+    tipo: 'Microempreendedor Individual (MEI)',
+    documento: '63.371.209/0001-81',
+    endereco: 'Rua Muana, 240, São Paulo/SP',
+    whatsapp: '5511959304102',
+    whatsappFormatado: '(11) 95930-4102',
+    pix: {
+      chave: '+5511959304102',          // chave Pix (telefone no formato +55DDDNÚMERO)
+      chaveFormatada: '+55 (11) 95930-4102',
+      tipo: 'telefone',
+      nome: 'GABRIEL VALEMTIM RIBEIRO',  // até 25 letras, sem acento
+      cidade: 'SAO PAULO'                // até 15 letras, sem acento
+    },
+    foro: 'São Paulo/SP',
+    versaoContrato: '4.0'
+  };
 
-/* Planos, na ordem em que aparecem no site.
-   prazo                     → dias úteis para a entrega
-   prazoMax                  → teto do prazo em alta demanda ou problemas técnicos (aparece no site e no contrato)
-   destaque: true            → card em azul ("Recomendado") e opção já marcada na contratação
-   loja: true                → o contrato pede a lista de produtos
-   suportePrioritario: true  → o contrato cita atendimento prioritário */
-window.PLANOS = {
-  essencial: {
-    id: 'essencial',
-    nome: 'Essencial',
-    artigo: 'o',
-    valor: 597.00,
-    selo: 'Para começar',
-    chamada: 'Uma página profissional para o cliente encontrar você e chamar no WhatsApp',
-    ideal: 'autônomos, prestadores de serviço e negócios locais',
-    resumo: 'Site profissional de uma página para apresentar o seu negócio e levar clientes direto para o WhatsApp.',
-    destaques: [
-      'Site de 1 página com até 6 seções',
-      'Design personalizado com a sua marca',
-      'Perfeito no celular, tablet e computador',
-      'Botões e formulário direto no WhatsApp',
-      'Instagram e mapa do Google integrados',
-      'Otimização básica para o Google',
-      'Domínio .com.br grátis por 1 ano'
-    ],
-    entregas: [
-      'Site de 1 página (one-page) com até 6 seções, como início, sobre, serviços, galeria, dúvidas e contato',
-      'Design profissional personalizado com as cores e o logotipo da marca da CONTRATANTE',
-      'Layout adaptado para celular, tablet e computador',
-      'Botões e formulário que levam o cliente direto ao WhatsApp da CONTRATANTE',
-      'Integração com Instagram e mapa do Google',
-      'Otimização básica para buscadores (SEO): título, descrição e imagem de compartilhamento',
-      'Registro de domínio .com.br (ou .com) por 1 ano',
-      'Publicação em hospedagem em nuvem com certificado de segurança (https)'
-    ],
-    naoInclui: [
-      'Páginas além da página única contratada',
-      'Loja online e carrinho de compras',
-      'Pagamentos dentro do site',
-      'Vídeo comercial'
-    ],
-    paginas: '1 página com até 6 seções',
-    revisoes: 2,
-    prazo: 1,
-    prazoMax: 3,
-    suporte: 30
-  },
-  profissional: {
-    id: 'profissional',
-    nome: 'Profissional',
-    artigo: 'o',
-    valor: 997.00,
-    selo: 'Recomendado',
-    destaque: true,
-    chamada: 'Site completo, com várias páginas, para a sua empresa passar confiança',
-    ideal: 'empresas, clínicas, restaurantes e escritórios',
-    resumo: 'Site institucional completo, com várias páginas, design premium e as ferramentas para a sua empresa ser encontrada no Google e receber pedidos de orçamento.',
-    destaques: [
-      'Tudo do Essencial, e mais:',
-      'Site com até 5 páginas',
-      'Design premium com animações',
-      'Galeria, cardápio ou tabela de preços',
-      'SEO em todas as páginas + Search Console',
-      'Pixel da Meta e Google Analytics'
-    ],
-    entregas: [
-      'Tudo o que está incluído no plano Essencial',
-      'Site com até 5 páginas (por exemplo: início, sobre, serviços, galeria e contato)',
-      'Design premium com animações',
-      'Uma seção de conteúdo sob medida, como galeria de fotos ou de projetos, cardápio ou tabela de serviços e preços, com o conteúdo fornecido pela CONTRATANTE',
-      'Otimização para buscadores (SEO) em todas as páginas e cadastro no Google Search Console',
-      'Instalação do Pixel da Meta e do Google Analytics',
-      'Registro de domínio .com.br (ou .com) por 1 ano',
-      'Publicação em hospedagem em nuvem com certificado de segurança (https)'
-    ],
-    naoInclui: [
-      'Loja online e carrinho de compras',
-      'Pagamentos dentro do site',
-      'Vídeo comercial',
-      'Gestão de anúncios pagos'
-    ],
-    paginas: 'até 5 páginas',
-    revisoes: 3,
-    prazo: 1,
-    prazoMax: 3,
-    suporte: 60
-  },
-  loja: {
-    id: 'loja',
-    nome: 'Loja Online',
-    artigo: 'a',
-    valor: 1597.00,
-    selo: 'Para vender online',
-    loja: true,
-    suportePrioritario: true,
-    chamada: 'Loja completa, com carrinho e pagamento no site, para vender todos os dias',
-    ideal: 'quem vende produtos e quer receber pedidos pelo site',
-    resumo: 'O plano mais completo da Webora: site com loja online, pagamento por Pix e cartão e tudo o que a sua empresa precisa para vender pela internet.',
-    destaques: [
-      'Tudo do Profissional, e mais:',
-      'Loja online com carrinho de compras',
-      'Pagamento por Pix e cartão no site',
-      'Até 8 páginas e 30 produtos cadastrados',
-      'Pedido pelo WhatsApp com o carrinho pronto',
-      'Vídeo comercial para Reels e Status',
-      'Suporte prioritário'
-    ],
-    entregas: [
-      'Tudo o que está incluído no plano Profissional',
-      'Site com até 8 páginas (por exemplo: início, sobre, loja, produto, carrinho, contato e políticas)',
-      'Loja online com catálogo de produtos, carrinho de compras e finalização do pedido',
-      'Pagamento online por Pix e cartão, integrado a um intermediador de pagamento em nome da CONTRATANTE (por exemplo, Mercado Pago)',
-      'Cadastro inicial de até 30 produtos, com fotos, descrições e preços fornecidos pela CONTRATANTE',
-      'Opção de pedido pelo WhatsApp com a mensagem do carrinho pronta',
-      'Otimização para buscadores focada em vendas',
-      '1 (um) vídeo comercial vertical de até 30 segundos para Reels, Stories e Status',
-      'Registro de domínio .com.br (ou .com) por 1 ano',
-      'Publicação em hospedagem em nuvem com certificado de segurança (https)'
-    ],
-    naoInclui: [
-      'Gestão de anúncios pagos',
-      'Cadastro de produtos além dos 30 iniciais',
-      'Taxas cobradas pelo intermediador de pagamento',
-      'Produção de fotos profissionais dos produtos'
-    ],
-    paginas: 'até 8 páginas',
-    revisoes: 4,
-    prazo: 1,
-    prazoMax: 3,
-    suporte: 90
-  }
-};
+  /* Planos, na ordem em que aparecem no site (o do meio é o destaque).
+     centavos            → preço em centavos (inteiro)
+     destaques           → itens do card (lista com check)
+     entregas/naoInclui  → Anexo I do contrato
+     prazo / prazoMax    → dias úteis de entrega / teto em alta demanda ou problemas técnicos
+     destaque: true      → card preto com borda verde e opção já marcada na contratação
+     loja: true          → o contrato pede a lista de produtos
+     premium: true       → cláusulas do nome comercial e do escopo definido no briefing
+     suportePrioritario  → o contrato cita atendimento prioritário */
+  const PLANOS = {
+    essencial: {
+      id: 'essencial',
+      nome: 'Essencial',
+      nomeCurto: 'Essencial',
+      artigo: 'o',
+      centavos: 59999,
+      selo: 'Para começar',
+      botao: 'Escolher Essencial',
+      descricao: 'Uma presença digital profissional para clientes encontrarem sua empresa e entrarem em contato rapidamente.',
+      ideal: 'autônomos, prestadores de serviço e negócios locais que querem começar',
+      resumo: 'Landing page profissional de uma página para apresentar a empresa e levar o cliente direto para o WhatsApp.',
+      destaques: [
+        'Landing page profissional de alta qualidade',
+        'Uma página com até seis seções',
+        'Design personalizado para a sua marca',
+        'Perfeito no celular, tablet e computador',
+        'Integração com WhatsApp',
+        'Botões de Instagram e redes sociais',
+        'Localização pelo Google Maps',
+        'SEO básico',
+        'Domínio .com.br incluído por 1 ano'
+      ],
+      entregas: [
+        'Landing page profissional de 1 (uma) página com até 6 (seis) seções, como início, sobre, serviços, galeria, dúvidas e contato',
+        'Design personalizado com as cores e o logotipo da marca da CONTRATANTE',
+        'Layout responsivo para celular, tablet e computador',
+        'Integração com o WhatsApp da CONTRATANTE: botões e formulário que abrem a conversa',
+        'Botões para o Instagram e demais redes sociais da CONTRATANTE',
+        'Localização da empresa pelo Google Maps',
+        'Otimização básica para buscadores (SEO): título, descrição e imagem de compartilhamento',
+        'Registro de domínio .com.br (ou .com) por 1 (um) ano',
+        'Publicação em hospedagem em nuvem com certificado de segurança (https)'
+      ],
+      naoInclui: [
+        'Páginas além da página única contratada',
+        'Loja virtual, carrinho de compras e pagamentos dentro do site',
+        'Gestão de anúncios pagos',
+        'Produção de fotos e textos'
+      ],
+      paginas: '1 (uma) página com até 6 (seis) seções',
+      revisoes: 2,
+      prazo: 1,
+      prazoMax: 3,
+      suporte: 30
+    },
+    loja: {
+      id: 'loja',
+      nome: 'Loja Online',
+      nomeCurto: 'Loja Online',
+      artigo: 'a',
+      centavos: 99999,
+      selo: 'Mais escolhido',
+      botao: 'Escolher Loja Online',
+      destaque: true,
+      loja: true,
+      descricao: 'Uma estrutura completa de vendas online para transformar visitantes em clientes.',
+      ideal: 'quem quer vender produtos ou serviços pela internet com praticidade e segurança',
+      resumo: 'Estrutura completa de vendas online: loja virtual, landing page premium, checkout com Pix e cartão e as ferramentas para vender pela internet.',
+      lista: 'Tudo do Essencial, e mais:',
+      destaques: [
+        'Loja virtual moderna',
+        'Landing page premium de alta conversão',
+        'Design personalizado de alto padrão',
+        'Catálogo e página de cada produto',
+        'Busca e categorias',
+        'Carrinho de compras e checkout funcional',
+        'Pix e cartão pelo provedor de pagamento configurado',
+        'Cadastro inicial de até 30 produtos',
+        'Gestão de produtos e estoque',
+        'SEO avançado + Google Search Console',
+        'Google Analytics e Pixel da Meta, quando configurados'
+      ],
+      entregas: [
+        'Tudo o que está incluído no plano Essencial',
+        'Loja virtual moderna com até 8 (oito) páginas-modelo, como início, catálogo, produto, carrinho, checkout, contato e políticas, e uma página para cada produto cadastrado',
+        'Landing page premium de alta conversão',
+        'Design personalizado de alto padrão',
+        'Catálogo de produtos com busca e categorias',
+        'Carrinho de compras e checkout funcional',
+        'Pagamento online por Pix e cartão, integrado a um provedor de pagamento (por exemplo, Mercado Pago) em conta da CONTRATANTE',
+        'Cadastro inicial de até 30 (trinta) produtos, com fotos, descrições e preços fornecidos pela CONTRATANTE',
+        'Gestão de produtos e estoque',
+        'Integração com o WhatsApp da CONTRATANTE',
+        'SEO avançado e cadastro no Google Search Console',
+        'Instalação do Google Analytics e do Pixel da Meta, quando a CONTRATANTE fornecer ou autorizar a criação das contas',
+        'Registro de domínio .com.br (ou .com) por 1 (um) ano',
+        'Publicação em hospedagem em nuvem com certificado de segurança (https)'
+      ],
+      naoInclui: [
+        'Cadastro de produtos além dos 30 iniciais',
+        'Taxas cobradas pelo provedor de pagamento',
+        'Gestão de anúncios pagos',
+        'Produção de fotos profissionais dos produtos'
+      ],
+      paginas: 'loja com até 8 (oito) páginas-modelo, mais a página de cada produto cadastrado',
+      revisoes: 3,
+      prazo: 1,
+      prazoMax: 3,
+      suporte: 60
+    },
+    premium: {
+      id: 'premium',
+      nome: 'Sites de 10 Mil Profissionais',
+      nomeCurto: 'Premium',
+      artigo: 'o',
+      centavos: 159999,
+      selo: 'Experiência premium',
+      botao: 'Escolher plano Premium',
+      premium: true,
+      suportePrioritario: true,
+      descricao: 'Uma experiência digital exclusiva para empresas que exigem sofisticação, velocidade, tecnologia e uma presença online de alto padrão.',
+      ideal: 'empresas, clínicas, escritórios e marcas que querem autoridade e máxima performance',
+      resumo: 'O plano de maior nível da Webora: site exclusivo de múltiplas páginas, com design premium, animações refinadas, SEO técnico avançado e os recursos da Loja Online que se aplicarem ao projeto.',
+      lista: 'Tudo da Loja Online, e mais:',
+      nota: 'Recursos de loja incluídos quando o projeto vender produtos.',
+      destaques: [
+        'Design premium totalmente personalizado',
+        'Layout exclusivo, sem aparência de template',
+        'Landing page de altíssima conversão',
+        'Até 12 páginas, com escopo definido no contrato',
+        'Páginas institucionais completas',
+        'Portfólio ou catálogo interativo',
+        'Animações cinematográficas e transições avançadas',
+        'Painel administrativo, quando previsto no escopo',
+        'SEO técnico avançado',
+        'Integrações de analytics e marketing',
+        'Otimização avançada de desempenho',
+        'Segurança e acessibilidade'
+      ],
+      entregas: [
+        'Todos os recursos do plano Loja Online que se aplicarem ao projeto da CONTRATANTE (por exemplo, loja virtual e checkout quando a CONTRATANTE vender produtos pelo site)',
+        'Design premium totalmente personalizado, com layout exclusivo e sem aparência de template',
+        'Landing page de altíssima conversão',
+        'Estrutura de múltiplas páginas, até 12 (doze) páginas, com o mapa de páginas definido no briefing',
+        'Páginas institucionais completas',
+        'Portfólio ou catálogo interativo',
+        'Animações de interface refinadas, animações cinematográficas discretas e transições avançadas',
+        'Painel administrativo, quando necessário ao projeto e previsto no escopo definido no briefing',
+        'SEO técnico avançado e cadastro no Google Search Console',
+        'Integrações de analytics e marketing, como Google Analytics, Google Tag Manager e Pixel da Meta, com contas fornecidas ou autorizadas pela CONTRATANTE',
+        'Otimização avançada de desempenho',
+        'Boas práticas de segurança e de acessibilidade',
+        'Registro de domínio .com.br (ou .com) por 1 (um) ano',
+        'Publicação em hospedagem em nuvem com certificado de segurança (https)'
+      ],
+      naoInclui: [
+        'Páginas além das 12 (doze) previstas e funcionalidades fora do escopo definido no briefing',
+        'Taxas cobradas por provedores de pagamento e por ferramentas pagas de terceiros',
+        'Gestão de anúncios pagos',
+        'Produção de fotos e vídeos profissionais'
+      ],
+      paginas: 'até 12 (doze) páginas, com o mapa de páginas definido no briefing',
+      revisoes: 4,
+      prazo: 1,
+      prazoMax: 3,
+      suporte: 90
+    }
+  };
 
-/* Linhas da tabela de comparação: [item, Essencial, Profissional, Loja Online].
-   true = incluído, false = não incluído */
-window.COMPARATIVO = [
-  ['Páginas', '1 página (até 6 seções)', 'Até 5 páginas', 'Até 8 páginas'],
-  ['Design personalizado com a sua marca', true, 'Premium, com animações', 'Premium, com animações'],
-  ['Celular, tablet e computador', true, true, true],
-  ['WhatsApp integrado', true, true, true],
-  ['Instagram e mapa do Google', true, true, true],
-  ['Domínio .com.br por 1 ano', true, true, true],
-  ['Hospedagem com https', true, true, true],
-  ['Otimização para o Google (SEO)', 'Básica', 'Completa + Search Console', 'Para vendas + Search Console'],
-  ['Galeria, cardápio ou tabela de preços', false, true, true],
-  ['Pixel da Meta e Google Analytics', false, true, true],
-  ['Loja online com carrinho', false, false, true],
-  ['Pagamento por Pix e cartão no site', false, false, true],
-  ['Produtos cadastrados', false, false, 'Até 30'],
-  ['Vídeo comercial para Reels', false, false, true],
-  ['Rodadas de revisão', '2', '3', '4'],
-  ['Prazo de entrega', '1 dia útil', '1 dia útil', '1 dia útil'],
-  ['Suporte após a entrega', '30 dias', '60 dias', '90 dias, prioritário']
-];
+  /* Tabela "Tudo o que vem em cada plano", em grupos.
+     Em cada linha: true = incluído, false = não incluído, texto = detalhe.
+     As linhas de revisões, prazo e suporte são geradas a partir de PLANOS. */
+  const COMPARATIVO = [
+    { grupo: 'Estrutura e design', linhas: [
+      { item: 'Estrutura do site', essencial: '1 página, até 6 seções', loja: 'Loja com até 8 páginas-modelo + página de cada produto', premium: 'Até 12 páginas, definidas no contrato' },
+      { item: 'Landing page', essencial: 'Profissional', loja: 'Premium, de alta conversão', premium: 'Altíssima conversão' },
+      { item: 'Design', essencial: 'Personalizado para a marca', loja: 'Personalizado de alto padrão', premium: 'Premium exclusivo, sem template' },
+      { item: 'Celular, tablet e computador', essencial: true, loja: true, premium: true }
+    ] },
+    { grupo: 'Contato e presença', linhas: [
+      { item: 'Integração com WhatsApp', essencial: true, loja: true, premium: true },
+      { item: 'Instagram e redes sociais', essencial: true, loja: true, premium: true },
+      { item: 'Localização pelo Google Maps', essencial: true, loja: true, premium: true },
+      { item: 'Domínio .com.br por 1 ano', essencial: true, loja: true, premium: true },
+      { item: 'Hospedagem em nuvem com https', essencial: true, loja: true, premium: true }
+    ] },
+    { grupo: 'Google e marketing', linhas: [
+      { item: 'SEO', essencial: 'Básico', loja: 'Avançado + Search Console', premium: 'Técnico avançado + Search Console' },
+      { item: 'Google Analytics e Pixel da Meta', essencial: false, loja: 'Quando configurados', premium: 'Analytics e marketing integrados' }
+    ] },
+    { grupo: 'Vendas online', linhas: [
+      { item: 'Loja virtual, catálogo e carrinho', essencial: false, loja: true, premium: 'Quando aplicável' },
+      { item: 'Checkout com Pix e cartão', essencial: false, loja: true, premium: 'Quando aplicável' },
+      { item: 'Produtos cadastrados', essencial: false, loja: 'Até 30', premium: 'Até 30, quando aplicável' },
+      { item: 'Gestão de produtos e estoque', essencial: false, loja: true, premium: 'Quando aplicável' },
+      { item: 'Busca e categorias', essencial: false, loja: true, premium: 'Quando aplicável' }
+    ] },
+    { grupo: 'Experiência premium', linhas: [
+      { item: 'Páginas institucionais completas', essencial: false, loja: false, premium: true },
+      { item: 'Portfólio ou catálogo interativo', essencial: false, loja: false, premium: true },
+      { item: 'Animações e transições avançadas', essencial: false, loja: false, premium: true },
+      { item: 'Painel administrativo', essencial: false, loja: false, premium: 'Quando previsto no escopo' },
+      { item: 'Otimização avançada de desempenho', essencial: false, loja: false, premium: true },
+      { item: 'Segurança e acessibilidade avançadas', essencial: false, loja: false, premium: true }
+    ] }
+  ];
 
-/* Portfólio. O primeiro projeto aparece em destaque (card grande).
-   Para adicionar um projeto: salve um print de 1280×800 em assets/img/projetos/
-   e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido. */
-window.PROJETOS = [
-  {
-    id: 'kivora',
-    nome: 'Kivora',
-    tipo: 'Loja online',
-    segmento: 'Marketplace de eletrônicos, casa e moda',
-    url: 'https://www.kivorashop.com.br/',
-    dominio: 'kivorashop.com.br',
-    plano: 'loja',
-    descricao: 'Loja online completa, com busca, departamentos, ofertas relâmpago, cupons, favoritos e carrinho de compras. No celular, funciona como um aplicativo.',
-    recursos: ['Busca e departamentos', 'Ofertas e cupons', 'Carrinho e favoritos', 'Conta do cliente'],
-    imagem: 'assets/img/projetos/kivora.webp',
-    imagemCelular: 'assets/img/projetos/kivora-m.webp'
-  },
-  {
-    id: 'jesusnewjob',
-    nome: 'Jesus New Job',
-    tipo: 'Site institucional',
-    segmento: 'Comunicação visual · São Paulo',
-    url: 'https://www.jesusnewjob.com.br/',
-    dominio: 'jesusnewjob.com.br',
-    plano: 'profissional',
-    descricao: 'Site institucional para empresa de comunicação visual, com serviços, galeria de projetos, bastidores e pedido de orçamento.',
-    recursos: ['Galeria de projetos', 'Bastidores', 'Pedido de orçamento'],
-    imagem: 'assets/img/projetos/jesusnewjob.webp',
-    imagemCelular: 'assets/img/projetos/jesusnewjob-m.webp'
-  },
-  {
-    id: 'gvclean',
-    nome: 'GVClean',
-    tipo: 'Site de serviços',
-    segmento: 'Higienização de estofados · São Paulo',
-    url: 'https://gvclean.vercel.app/',
-    dominio: 'gvclean.vercel.app',
-    plano: 'profissional',
-    descricao: 'Site de serviços com tabela de valores, antes e depois interativo e orçamento direto pelo WhatsApp.',
-    recursos: ['Tabela de valores', 'Antes e depois interativo', 'Orçamento pelo WhatsApp'],
-    imagem: 'assets/img/projetos/gvclean.webp',
-    imagemCelular: 'assets/img/projetos/gvclean-m.webp'
-  },
-  {
-    id: 'oficinakeke',
-    nome: 'Oficina Mecânica Keke',
-    tipo: 'Site de oficina',
-    segmento: 'Oficina mecânica · Revisão, motor, freios e suspensão',
-    url: 'https://oficina-keke.vercel.app/',
-    dominio: 'oficina-keke.vercel.app',
-    plano: 'essencial',
-    descricao: 'Site de uma página para oficina mecânica, com serviços, banners de destaque, passo a passo do atendimento, dúvidas frequentes e orçamento direto pelo WhatsApp.',
-    recursos: ['Serviços', 'Banners de destaque', 'Orçamento pelo WhatsApp'],
-    imagem: 'assets/img/projetos/oficinakeke.webp',
-    imagemCelular: 'assets/img/projetos/oficinakeke-m.webp'
-  },
-  {
-    id: 'sulintech',
-    nome: 'Sulin Tech',
-    tipo: 'Site de assistência técnica',
-    segmento: 'Celulares, notebooks e videogames · Cidade Tiradentes, São Paulo',
-    url: 'https://sulin-tech.vercel.app/',
-    dominio: 'sulin-tech.vercel.app',
-    plano: 'profissional',
-    descricao: 'Site de assistência técnica com serviços filtrados por aparelho, pedido de orçamento que chega pronto no WhatsApp da loja, dúvidas frequentes e mapa.',
-    recursos: ['Serviços por aparelho', 'Orçamento pelo WhatsApp', 'Mapa e contato'],
-    imagem: 'assets/img/projetos/sulintech.webp',
-    imagemCelular: 'assets/img/projetos/sulintech-m.webp'
-  }
-];
+  /* Portfólio. O primeiro projeto aparece em destaque (card grande).
+     Para adicionar um projeto: salve um print de 1280×800 em assets/img/projetos/
+     e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido. */
+  const PROJETOS = [
+    {
+      id: 'kivora',
+      nome: 'Kivora',
+      tipo: 'Loja online',
+      segmento: 'Marketplace de eletrônicos, casa e moda',
+      url: 'https://www.kivorashop.com.br/',
+      dominio: 'kivorashop.com.br',
+      plano: 'loja',
+      descricao: 'Loja online completa, com busca, departamentos, ofertas relâmpago, cupons, favoritos e carrinho de compras. No celular, funciona como um aplicativo.',
+      recursos: ['Busca e departamentos', 'Ofertas e cupons', 'Carrinho e favoritos', 'Conta do cliente'],
+      imagem: '/assets/img/projetos/kivora.webp',
+      imagemCelular: '/assets/img/projetos/kivora-m.webp'
+    },
+    {
+      id: 'jesusnewjob',
+      nome: 'Jesus New Job',
+      tipo: 'Site institucional',
+      segmento: 'Comunicação visual · São Paulo',
+      url: 'https://www.jesusnewjob.com.br/',
+      dominio: 'jesusnewjob.com.br',
+      plano: 'premium',
+      descricao: 'Site institucional para empresa de comunicação visual, com serviços, galeria de projetos, bastidores e pedido de orçamento.',
+      recursos: ['Galeria de projetos', 'Bastidores', 'Pedido de orçamento'],
+      imagem: '/assets/img/projetos/jesusnewjob.webp',
+      imagemCelular: '/assets/img/projetos/jesusnewjob-m.webp'
+    },
+    {
+      id: 'gvclean',
+      nome: 'GVClean',
+      tipo: 'Site de serviços',
+      segmento: 'Higienização de estofados · São Paulo',
+      url: 'https://gvclean.vercel.app/',
+      dominio: 'gvclean.vercel.app',
+      plano: 'essencial',
+      descricao: 'Site de serviços com tabela de valores, antes e depois interativo e orçamento direto pelo WhatsApp.',
+      recursos: ['Tabela de valores', 'Antes e depois interativo', 'Orçamento pelo WhatsApp'],
+      imagem: '/assets/img/projetos/gvclean.webp',
+      imagemCelular: '/assets/img/projetos/gvclean-m.webp'
+    },
+    {
+      id: 'oficinakeke',
+      nome: 'Oficina Mecânica Keke',
+      tipo: 'Site de oficina',
+      segmento: 'Oficina mecânica · Revisão, motor, freios e suspensão',
+      url: 'https://oficina-keke.vercel.app/',
+      dominio: 'oficina-keke.vercel.app',
+      plano: 'essencial',
+      descricao: 'Site de uma página para oficina mecânica, com serviços, banners de destaque, passo a passo do atendimento, dúvidas frequentes e orçamento direto pelo WhatsApp.',
+      recursos: ['Serviços', 'Banners de destaque', 'Orçamento pelo WhatsApp'],
+      imagem: '/assets/img/projetos/oficinakeke.webp',
+      imagemCelular: '/assets/img/projetos/oficinakeke-m.webp'
+    },
+    {
+      id: 'sulintech',
+      nome: 'Sulin Tech',
+      tipo: 'Site de assistência técnica',
+      segmento: 'Celulares, notebooks e videogames · Cidade Tiradentes, São Paulo',
+      url: 'https://sulin-tech.vercel.app/',
+      dominio: 'sulin-tech.vercel.app',
+      plano: 'essencial',
+      descricao: 'Site de assistência técnica com serviços filtrados por aparelho, pedido de orçamento que chega pronto no WhatsApp da loja, dúvidas frequentes e mapa.',
+      recursos: ['Serviços por aparelho', 'Orçamento pelo WhatsApp', 'Mapa e contato'],
+      imagem: '/assets/img/projetos/sulintech.webp',
+      imagemCelular: '/assets/img/projetos/sulintech-m.webp'
+    }
+  ];
+
+  return { SITE, WEBORA, PLANOS, COMPARATIVO, PROJETOS };
+});
