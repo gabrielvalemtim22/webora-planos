@@ -257,8 +257,8 @@
       plano: 'loja',
       descricao: 'Loja online completa, com busca, departamentos, ofertas relâmpago, cupons, favoritos e carrinho de compras. No celular, funciona como um aplicativo.',
       recursos: ['Busca e departamentos', 'Ofertas e cupons', 'Carrinho e favoritos', 'Conta do cliente'],
-      imagem: '/assets/img/projetos/kivora.webp',
-      imagemCelular: '/assets/img/projetos/kivora-m.webp'
+      imagem: '/assets/img/projetos/kivora.webp?v=2',
+      imagemCelular: '/assets/img/projetos/kivora-m.webp?v=2'
     },
     {
       id: 'jesusnewjob',
