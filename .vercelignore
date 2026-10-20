@@ -1,6 +1,8 @@
-# Ferramentas e originais que não precisam ir para o site publicado
-scripts/
-tests/
-marca/
-package.json
-.claude/
+# Ferramentas e originais que não precisam ir para o site publicado.
+# Caminhos ancorados na raiz (com / no começo): "marca/" sem a barra também
+# excluiria assets/img/marca/, que é o logotipo usado no site.
+/scripts/
+/tests/
+/marca/
+/package.json
+/.claude/
