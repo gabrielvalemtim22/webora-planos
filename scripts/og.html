@@ -3,37 +3,42 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..900&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=block">
 <style>
   * { box-sizing: border-box; margin: 0; }
   html, body { width: 1200px; height: 630px; overflow: hidden; }
-  body { position: relative; background: #080808; color: #fff; font-family: 'Geist', 'Segoe UI', Arial, sans-serif; padding: 64px 72px; }
-  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 56px 56px; -webkit-mask-image: radial-gradient(ellipse 70% 80% at 85% 60%, #000 10%, transparent 75%); }
-  .glow { position: absolute; width: 760px; height: 760px; right: -260px; bottom: -380px; border-radius: 50%; background: radial-gradient(circle, rgba(155,255,0,.34), rgba(155,255,0,0) 62%); }
-  .swoosh { position: absolute; right: -40px; top: 40px; width: 560px; height: 560px; }
-  .brand { position: relative; display: flex; align-items: center; gap: 18px; }
-  .brand img:first-child { width: 64px; height: 64px; }
-  .brand img:last-child { height: 44px; width: auto; }
-  h1 { position: relative; margin-top: 70px; font-size: 92px; line-height: .98; font-weight: 800; letter-spacing: -.055em; }
-  mark { display: inline-block; margin-top: 10px; padding: 0 .16em .06em; border-radius: .14em; background: #9BFF00; color: #080808; }
-  .foot { position: absolute; left: 72px; right: 72px; bottom: 58px; display: flex; align-items: center; justify-content: space-between; }
+  body { position: relative; background: #fff; color: #080808; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; padding: 60px 72px; }
+  .geo { position: absolute; right: -120px; top: -110px; width: 640px; height: 860px; }
+  .brand { position: relative; display: flex; align-items: center; gap: 16px; }
+  .brand img:first-child { width: 62px; height: 62px; }
+  .brand img:last-child { height: 40px; width: auto; }
+  .eyebrow { position: relative; display: flex; align-items: center; gap: 16px; margin-top: 64px; color: #4B5261; font-size: 18px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; }
+  .eyebrow::after { content: ''; width: 56px; height: 2px; background: #0754FA; }
+  h1 { position: relative; margin-top: 18px; max-width: 760px; font-size: 84px; line-height: .98; font-weight: 800; letter-spacing: -.05em; }
+  h1 span { color: #0754FA; }
+  h1 i { font-style: normal; margin-left: -.07em; }
+  .foot { position: absolute; left: 72px; right: 72px; bottom: 54px; display: flex; align-items: center; justify-content: space-between; }
   .chips { display: flex; gap: 12px; }
-  .chips span { padding: 11px 20px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); font-size: 21px; font-weight: 500; color: #E8EAED; }
-  .chips span b { color: #9BFF00; font-weight: 700; margin-right: 8px; }
-  .url { font-size: 23px; font-weight: 600; color: #9BFF00; letter-spacing: -.01em; }
+  .chips span { padding: 11px 20px; border-radius: 12px; border: 1px solid #E3E7EF; background: #fff; font-size: 20px; font-weight: 600; color: #1A1D23; box-shadow: 0 10px 24px -18px rgba(7, 84, 250, .5); }
+  .chips span b { color: #0754FA; font-weight: 800; margin-right: 8px; }
+  .url { padding: 12px 22px; border-radius: 12px; background: #0754FA; color: #fff; font-size: 21px; font-weight: 700; letter-spacing: .02em; }
 </style>
 </head>
 <body>
-  <div class="grid"></div>
-  <div class="glow"></div>
-  <svg class="swoosh" viewBox="0 0 560 560" fill="none"><path d="M520 40C380 10 210 90 170 230c-40 140 90 250 230 210 120-34 140-170 40-230" stroke="#9BFF00" stroke-width="2.5" stroke-linecap="round" opacity=".75"/></svg>
+  <svg class="geo" viewBox="0 0 640 860" fill="none" aria-hidden="true">
+    <path d="M360 40 620 190v300L360 640 100 490V190Z" fill="#0754FA" opacity=".08"/>
+    <path d="M430 150 640 271v242L430 634 220 513V271Z" fill="#0754FA" opacity=".14"/>
+    <path d="M500 300 640 381v162L500 624 360 543V381Z" fill="#0754FA"/>
+    <path d="M360 40 620 190v300L360 640 100 490V190Z" stroke="#0754FA" stroke-opacity=".35" stroke-width="2"/>
+  </svg>
   <div class="brand">
     <img src="../assets/img/marca/webora-simbolo.webp" alt="">
-    <img src="../assets/img/marca/webora-logotipo-branco.webp" alt="">
+    <img src="../assets/img/marca/webora-logotipo-preto.webp" alt="">
   </div>
-  <h1>Sites que fazem<br>sua empresa<br><mark>vender mais.</mark></h1>
+  <p class="eyebrow">Sites profissionais</p>
+  <h1>Sua marca merece um site <span>extraordinário<i>.</i></span></h1>
   <div class="foot">
-    <div class="chips"><span><b>✓</b>Projetos reais no ar</span><span><b>✓</b>Contrato online</span><span><b>✓</b>Pix</span></div>
+    <div class="chips"><span><b>✓</b>Projetos reais no ar</span><span><b>✓</b>Pagamento único</span><span><b>✓</b>Contrato online</span></div>
     <span class="url">weborasites.com.br</span>
   </div>
 </body>

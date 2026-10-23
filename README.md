@@ -1,28 +1,30 @@
 # Webora: projetos, planos e contratação online
 
-Site da **Webora** (https://www.weborasites.com.br) com a vitrine de **projetos** publicados e os planos **Essencial (R$ 599,99)**, **Loja Online (R$ 999,99)** e **Sites de 10 Mil Profissionais (R$ 1.599,99)**. O cliente escolhe o plano, preenche os dados, lê e **assina o contrato online** (assinatura desenhada), recebe o **QR Code Pix** com o valor exato, baixa o **contrato em PDF** e envia tudo para a Webora pelo WhatsApp.
+Site da **Webora** (https://www.weborasites.com.br) com o **portfólio** de projetos publicados e os planos **Essencial (R$ 599,99)**, **Loja Online (R$ 599,99)** e **Sites de 10 Mil Profissionais (R$ 999,99)**, todos em pagamento único, sem mensalidade da Webora. O cliente escolhe o plano, preenche os dados, lê e **assina o contrato online** (assinatura desenhada), recebe o **QR Code Pix** com o valor exato, baixa o **contrato em PDF** e envia tudo para a Webora pelo WhatsApp.
 
-Identidade: verde-neon `#9BFF00`, preto `#080808` e branco, com cinza claro `#F5F6F7`, cinza escuro `#17191C` e bordas `#E7E9ED`. Fonte Geist.
+Identidade: azul royal `#0754FA`, preto `#080808` e branco, com cinza claro `#F4F6FA`, azul claro `#F0F5FF` e bordas `#E3E7EF`. Sobre o preto, textos pequenos em azul usam `#3D78FF` (contraste 5,1:1). Fonte Plus Jakarta Sans. Formas geométricas em hexágono, como o símbolo.
+
+Ofertas: cada plano mostra os selos "Oferta especial", "Preço único" e "Sem mensalidade da Webora"; o premium destaca "Seu projeto de alto padrão por R$ 999,99." (`chamada` no `config.js`). O site não mostra preço "de" nem contador de urgência.
 
 ## Como alterar preços, itens, prazos e projetos
 
 Tudo fica em **`assets/js/config.js`** (fonte única do site, da tabela, do contrato, do PDF, do Pix e da conferência no servidor):
 
 - `WEBORA`: dados da empresa (MEI, CNPJ, endereço, WhatsApp e chave Pix)
-- `PLANOS`: nome, preço **em centavos** (`centavos: 99999` = R$ 999,99), itens do card, entregas do contrato, prazo, revisões e suporte
+- `PLANOS`: nome, preço **em centavos** (`centavos: 59999` = R$ 599,99), selo da oferta, chamada, os três recursos com ícone do topo do card (`chaves`), itens do card, entregas do contrato, prazo, revisões e suporte
 - `COMPARATIVO`: linhas da tabela de comparação, em grupos (revisões, prazo e suporte saem de `PLANOS`)
-- `PROJETOS`: portfólio. O primeiro da lista aparece em destaque
+- `PROJETOS`: portfólio. O primeiro da lista aparece em destaque; `categoria` (`loja` ou `institucional`) alimenta o filtro Todos / Lojas online / Institucionais
 
 Depois de mudar um preço, rode `npm test`. O teste aponta os textos estáticos do `index.html` que precisam acompanhar o novo valor: a `<meta name="description">`, os dados estruturados (JSON-LD), o bloco `<noscript>` dos planos e o preço citado nas dúvidas.
 
 ### 50% + 50%
 
-Os valores são calculados em centavos. Quando o total tem centavo ímpar, a entrada fica com o centavo a mais e a soma fecha sempre no total: R$ 999,99 → R$ 500,00 + R$ 499,99.
+Os valores são calculados em centavos. Quando o total tem centavo ímpar, a entrada fica com o centavo a mais e a soma fecha sempre no total: R$ 599,99 → R$ 300,00 + R$ 299,99 e R$ 999,99 → R$ 500,00 + R$ 499,99.
 
 ### Adicionar um projeto
 
 1. Rode `npm run print -- <url do site> <id>`. Ele salva os prints em `assets/img/projetos/` (`<id>.webp`, 1280×800, e `<id>-m.webp`, 450×900 do celular).
-2. Copie um dos blocos de `PROJETOS` no `config.js` e troque nome, tipo, link, descrição e imagens.
+2. Copie um dos blocos de `PROJETOS` no `config.js` e troque nome, tipo, categoria, link, descrição e imagens. Os prints mantêm as cores próprias de cada site.
 3. Em `plano`, coloque o id do plano indicado para um site parecido (`essencial`, `loja` ou `premium`).
 4. Atualize o número de projetos no `index.html` (`data-stat="projetos"`); o `npm test` avisa se esquecer.
 
@@ -36,9 +38,9 @@ assets/js/config.js        dados da Webora, dos planos e dos projetos (edite aqu
 assets/js/contrato.js      contrato, valores, validação, Pix e PDF (navegador e servidor)
 assets/js/app.js           página, vitrine, planos, comparação e assistente de contratação
 api/contrato.js            conferência do contrato no servidor (Vercel Function)
-assets/img/marca/          símbolo e logotipo (branco+verde e preto+verde)
+assets/img/marca/          símbolo (hexágono com contorno azul) e logotipo (azul+preto e azul+branco)
 favicon.ico, icon*.png     ícones da aba, do app e do iPhone (apple-icon.png)
-marca/                     imagens originais da marca (não vão para o site)
+marca/                     imagens originais da marca enviadas pela Webora (não vão para o site)
 scripts/                   servidor local, gerador da marca e modelo da imagem de compartilhamento
 tests/                     testes (npm test)
 ```
@@ -65,6 +67,6 @@ npm run marca   # regenera logotipo, favicons e assets/img/og.jpg a partir de ma
 
 - Domínio canônico: `https://www.weborasites.com.br/` (o endereço sem `www` redireciona para ele). O endereço `webora-planos.vercel.app` redireciona para o domínio.
 - `sitemap.xml`, `robots.txt`, Open Graph, Twitter/X Cards e dados estruturados (Organization, WebSite e Service com as ofertas).
-- As imagens ficam 7 dias em cache no navegador (`vercel.json`). Ao trocar uma imagem, salve com outro nome ou acrescente `?v=5` no endereço.
+- As imagens ficam 7 dias em cache no navegador (`vercel.json`). Ao trocar uma imagem, salve com outro nome ou aumente o número de versão (`?v=5`) no endereço.
 
 Publicação: cada `git push` na branch `main` atualiza o site na Vercel.

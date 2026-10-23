@@ -19,11 +19,21 @@ const read = f => readFile(path.join(ROOT, f), 'utf8');
 const CLIENTE = { nome: 'Maria Teste da Silva', doc: '529.982.247-25', tel: '(11) 98888-7777', email: 'maria@example.com', cidade: 'São Paulo/SP' };
 
 test('preços oficiais em centavos', () => {
-  assert.deepEqual(LISTA.map(P => [P.id, P.centavos]), [['essencial', 59999], ['loja', 99999], ['premium', 159999]]);
+  assert.deepEqual(LISTA.map(P => [P.id, P.centavos]), [['essencial', 59999], ['loja', 59999], ['premium', 99999]]);
   assert.deepEqual(LISTA.map(P => P.nome), ['Essencial', 'Loja Online', 'Sites de 10 Mil Profissionais']);
   LISTA.forEach(P => assert.ok(Number.isInteger(P.centavos) && P.centavos > 0, P.id));
   assert.equal(LISTA.filter(P => P.destaque).length, 1);
   assert.equal(LISTA[1].destaque, true, 'Loja Online fica no centro e em destaque');
+});
+
+test('ofertas: selo, três recursos com ícone e chamada do premium com o preço certo', async () => {
+  const html = await read('index.html');
+  for (const P of LISTA) {
+    assert.equal(P.oferta, 'Oferta especial', P.id);
+    assert.equal(P.chaves.length, 3, P.id);
+    P.chaves.forEach(k => assert.ok(html.includes(`<symbol id="i-${k.icone}"`), `${P.id}: ícone ${k.icone}`));
+  }
+  assert.equal(norm(PLANOS.premium.chamada.replace('{preco}', C.brl(PLANOS.premium.centavos))), 'Seu projeto de alto padrão por R$ 999,99.');
 });
 
 test('50% + 50% fecha exatamente o total, com o centavo ímpar na entrada', () => {
@@ -34,8 +44,10 @@ test('50% + 50% fecha exatamente o total, com o centavo ímpar na entrada', () =
     assert.equal(pc.agora + pc.depois, P.centavos, P.id);
     assert.ok(pc.agora - pc.depois === 0 || pc.agora - pc.depois === 1, P.id);
   }
-  const loja = C.condicoes(PLANOS.loja, 'parcelado');
-  assert.deepEqual([norm(C.brl(loja.agora)), norm(C.brl(loja.depois))], ['R$ 500,00', 'R$ 499,99']);
+  const par = id => { const c = C.condicoes(PLANOS[id], 'parcelado'); return [norm(C.brl(c.agora)), norm(C.brl(c.depois))]; };
+  assert.deepEqual(par('essencial'), ['R$ 300,00', 'R$ 299,99']);
+  assert.deepEqual(par('loja'), ['R$ 300,00', 'R$ 299,99']);
+  assert.deepEqual(par('premium'), ['R$ 500,00', 'R$ 499,99']);
   assert.equal(C.condicoes({ centavos: 100000 }, 'parcelado').agora, 50000);
 });
 
@@ -96,6 +108,7 @@ test('contrato usa os valores e as cláusulas certas de cada plano', () => {
 test('tabela comparativa e projetos batem com os planos', () => {
   COMPARATIVO.forEach(g => g.linhas.forEach(l => LISTA.forEach(P => assert.ok(P.id in l, `${l.item} sem ${P.id}`))));
   PROJETOS.forEach(p => assert.ok(PLANOS[p.plano], `${p.id}: plano ${p.plano}`));
+  PROJETOS.forEach(p => assert.ok(['loja', 'institucional'].includes(p.categoria), `${p.id}: categoria ${p.categoria}`));
   const ids = new Set(PROJETOS.map(p => p.id));
   assert.equal(ids.size, PROJETOS.length);
 });
@@ -122,17 +135,22 @@ test('textos estáticos do index.html acompanham config.js', async () => {
   assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
 });
 
-test('identidade nova: sem azul antigo nem preços antigos', async () => {
-  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest'];
+test('identidade azul royal: sem o verde-neon, preços antigos ou urgência falsa', async () => {
+  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
   for (const f of files) {
     const s = await read(f);
-    assert.ok(!/#(0052FF|1F66FF|003CC7|6E9BFF|DCE7FF|2F6BFF|10204a|0046E0)\b/i.test(s), `azul em ${f}`);
-    assert.ok(!/--blue|t-blue|0,\s*82,\s*255/.test(s), `token azul em ${f}`);
-    assert.ok(!/R\$\s?(597|997|1\.597)\b|valor: (597|997|1597)/.test(s), `preço antigo em ${f}`);
+    assert.ok(!/#(9BFF00|B5FF45|86E000|EDFFD1|C8FF66)\b/i.test(s), `verde-neon em ${f}`);
+    assert.ok(!/--neon|btn--neon|t-neon|155,\s*255,\s*0/.test(s), `token verde em ${f}`);
+    assert.ok(!/R\$\s?(597|997|1\.597|1\.599)\b|valor: (597|997|1597)|1599\.99|159999/.test(s), `preço antigo em ${f}`);
+    assert.ok(!/R\$\s?10\.000|de R\$\s?10/.test(s), `preço "de" sem comprovação em ${f}`);
+    assert.ok(!/últimas horas|vai esgotar|nunca mais/i.test(s), `urgência falsa em ${f}`);
     assert.ok(!/webora-planos\.vercel\.app/.test(s), `domínio antigo em ${f}`);
   }
+  assert.match(await read('assets/css/style.css'), /--blue: #0754FA;/);
   const img = await readdir(path.join(ROOT, 'assets/img'));
   assert.ok(!img.includes('webora-mark.webp') && !img.includes('favicon-48.png'), 'logo/ícones antigos removidos');
+  const marca = await readdir(path.join(ROOT, 'assets/img/marca'));
+  assert.deepEqual(marca.sort(), ['webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-simbolo.webp']);
 });
 
 /* ---------- api/contrato.js ---------- */
@@ -153,8 +171,10 @@ test('API: confere e devolve os valores oficiais', async () => {
   const r = await call({ ...PEDIDO, total: 1, agora: 1, centavos: 1 });   // valores enviados pelo navegador são ignorados
   assert.equal(r.status, 200);
   assert.equal(r.headers['cache-control'], 'no-store');
-  assert.deepEqual(r.body.pagamento, { tipo: 'parcelado', total: 99999, agora: 50000, depois: 49999 });
-  assert.equal(r.body.pix, C.pixWebora(50000, PEDIDO.numero));
+  assert.deepEqual(r.body.pagamento, { tipo: 'parcelado', total: 59999, agora: 30000, depois: 29999 });
+  assert.equal(r.body.pix, C.pixWebora(30000, PEDIDO.numero));
+  const premium = await call({ ...PEDIDO, plano: 'premium', pagamento: 'avista' });
+  assert.deepEqual(premium.body.pagamento, { tipo: 'avista', total: 99999, agora: 99999, depois: 0 });
   assert.equal(r.body.recibo, null);
 });
 

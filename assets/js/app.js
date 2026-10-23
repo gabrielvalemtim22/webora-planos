@@ -25,6 +25,7 @@
   $$('[data-wa]').forEach(a => { a.href = wa(a.dataset.wa); });
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
   $$('[data-preco]').forEach(el => { const P = PLANOS[el.dataset.preco]; if (P) el.textContent = C.brl(P.centavos); });
+  $$('[data-preco-min]').forEach(el => { el.textContent = C.brl(Math.min(...LISTA.map(P => P.centavos))); });
 
   /* ---------- cabeçalho, menu e seção ativa ---------- */
   const header = $('[data-header]');
@@ -77,47 +78,85 @@
   $$('[data-stat="prazo-max"]').forEach(el => { el.textContent = C.dias(prazoMax); });
   $$('[data-prazo-extra]').forEach(el => { el.hidden = prazoMax <= prazoMin; });
 
-  /* ---------- projetos ---------- */
-  const browser = (p, eager) => `<figure class="browser">
-        <div class="browser__bar"><i></i><i></i><i></i><span>${esc(p.dominio)}</span></div>
-        <img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)}" width="1280" height="800" decoding="async"${eager ? '' : ' loading="lazy"'}>
+  /* ---------- portfólio ---------- */
+  // os prints mantêm as cores próprias de cada site; a moldura é a da Webora
+  const browser = p => `<figure class="browser">
+        <div class="browser__bar"><i></i><i></i><i></i><span>${icon('lock')}${esc(p.dominio)}</span></div>
+        <img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)}" width="1280" height="800" loading="lazy" decoding="async">
       </figure>`;
-  // abaixo do destaque, cards em linhas de 3 quando em 2 colunas sobraria um sozinho
-  const resto = PROJETOS.length - 1;
-  $('[data-work]').classList.toggle('work--3', resto % 2 === 1 && resto % 3 === 0);
-  $('[data-work]').innerHTML = PROJETOS.map((p, i) => {
+  const work = $('[data-work]');
+  work.innerHTML = PROJETOS.map((p, i) => {
     const P = PLANOS[p.plano], feature = i === 0;
-    return `<article class="case${feature ? ' case--feature' : ''}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 3) * .08}s"`}>
+    return `<article class="case${feature ? ' case--feature' : ''}" data-cat="${esc(p.categoria || 'institucional')}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 3) * .08}s"`}>
       <a class="case__media" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Abrir o site ${esc(p.nome)} em nova aba">
         ${browser(p)}
         ${feature && p.imagemCelular ? `<figure class="device"><img src="${esc(p.imagemCelular)}" alt="" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
       </a>
       <div class="case__body">
-        <p class="case__tag">${esc(p.tipo)}</p>
-        <h3 class="case__name">${esc(p.nome)}</h3>
-        <p class="case__seg">${esc(p.segmento)}</p>
-        <p class="case__desc">${esc(p.descricao)}</p>
-        <ul class="case__feats">${p.recursos.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+        <div class="case__head">
+          <p class="case__tag">${esc(p.tipo)}</p>
+          <h3 class="case__name">${esc(p.nome)}</h3>
+          <p class="case__seg">${esc(p.segmento)}</p>
+        </div>
+        <div class="case__info">
+          <p class="case__desc">${esc(p.descricao)}</p>
+          <ul class="case__feats">${p.recursos.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+        </div>
         <div class="case__foot">
-          <a class="case__link" href="${esc(p.url)}" target="_blank" rel="noopener">Ver site no ar ${icon('ext')}</a>
+          <a class="case__link" href="${esc(p.url)}" target="_blank" rel="noopener">Explorar projeto ${icon('ext')}<span class="sr-only"> ${esc(p.nome)} (abre em nova aba)</span></a>
           ${P ? `<a class="case__plan" href="#contratar" data-choose="${P.id}">Plano indicado: <b>${esc(P.nome)}</b></a>` : ''}
         </div>
       </div>
     </article>`;
   }).join('');
 
+  // abaixo do destaque, cards em linhas de 3 quando em 2 colunas sobraria um sozinho
+  function layoutWork() {
+    const comuns = $$('.case:not(.case--feature):not([hidden])', work).length;
+    work.classList.toggle('work--3', comuns % 2 === 1 && comuns % 3 === 0);
+    work.classList.toggle('work--1', comuns === 1);
+  }
+  layoutWork();
+
+  const filtros = $$('[data-filter]'), filtroStatus = $('[data-filter-status]');
+  const temCategoria = cat => cat === 'todos' || PROJETOS.some(p => (p.categoria || 'institucional') === cat);
+  filtros.forEach(b => { if (!temCategoria(b.dataset.filter)) b.hidden = true; });
+  filtros.forEach(b => b.addEventListener('click', () => {
+    const cat = b.dataset.filter;
+    filtros.forEach(f => f.setAttribute('aria-pressed', String(f === b)));
+    let n = 0;
+    $$('.case', work).forEach(c => {
+      const ok = cat === 'todos' || c.dataset.cat === cat, was = !c.hidden;
+      c.hidden = !ok;
+      if (!ok) return;
+      n++;
+      c.classList.add('in');
+      if (!was && !reduce()) c.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+    });
+    layoutWork();
+    filtroStatus.textContent = `${n} ${n === 1 ? 'projeto exibido' : 'projetos exibidos'}`;
+  }));
+
   /* ---------- planos ---------- */
   const VISIVEIS = 6;   // no celular, os demais itens ficam em "Ver todos os recursos"
   const valor = c => { const [int, dec] = C.reais(c).split('.'); return `${Number(int).toLocaleString('pt-BR')},${dec}`; };
+  const numero = i => String(i + 1).padStart(2, '0');
   $('[data-plans]').innerHTML = LISTA.map((P, i) => {
     const top = P.id === TOP, extra = Math.max(0, P.destaques.length - VISIVEIS);
+    const chamada = P.chamada ? P.chamada.replace('{preco}', C.brl(P.centavos)) : '';
     return `<article class="plan plan--${P.id}${top ? ' plan--top' : ''}" data-reveal style="--d:${i * .08}s" aria-labelledby="plano-${P.id}">
-      <span class="plan__badge">${P.premium ? icon('spark') : ''}${esc(P.selo)}</span>
+      <div class="plan__top"><span class="plan__n" aria-hidden="true">${numero(i)}</span><span class="plan__badge">${P.premium ? icon('spark') : ''}${esc(P.selo)}</span></div>
       <h3 class="plan__name" id="plano-${P.id}">${esc(P.nome)}</h3>
       <p class="plan__desc">${esc(P.descricao)}</p>
-      <p class="plan__price"><span class="sr-only">${C.brl(P.centavos)}</span><span class="cur" aria-hidden="true">R$</span><b aria-hidden="true">${valor(P.centavos)}</b></p>
-      <p class="plan__terms">Pagamento único · Pix à vista ou 50% + 50%</p>
-      <a class="btn btn--neon btn--lg btn--block" href="#contratar" data-choose="${P.id}">${esc(P.botao)} ${icon('arrow', 'i i--move')}</a>
+      <div class="plan__pricebox">
+        ${P.oferta ? `<p class="plan__offer">${icon('spark')}${esc(P.oferta)}</p>` : ''}
+        <p class="plan__price"><span class="sr-only">${C.brl(P.centavos)}</span><span class="cur" aria-hidden="true">R$</span><b aria-hidden="true">${valor(P.centavos)}</b></p>
+        <p class="plan__terms"><b>Preço único</b> · Sem mensalidade da Webora</p>
+        <p class="plan__terms">Pix à vista ou 50% + 50%</p>
+        ${chamada ? `<p class="plan__call">${icon('spark')}<span>${esc(chamada)}</span></p>` : ''}
+      </div>
+      <ul class="plan__keys">${(P.chaves || []).map(k => `<li>${icon(k.icone)}<span>${esc(k.texto)}</span></li>`).join('')}</ul>
+      <a class="btn ${P.destaque ? 'btn--white' : 'btn--primary'} btn--lg btn--block" href="#contratar" data-choose="${P.id}">${esc(P.botao)} ${icon('arrow', 'i i--move')}</a>
       <div class="plan__features">
         ${P.lista ? `<p class="plan__lead">${esc(P.lista)}</p>` : ''}
         <ul class="plan__list" id="lista-${P.id}">${P.destaques.map((d, j) => `<li${j >= VISIVEIS ? ' class="is-extra"' : ''}>${icon('check')}<span>${esc(d)}</span></li>`).join('')}</ul>
@@ -154,9 +193,9 @@
     g.linhas.map(l => `<tr role="row"><th scope="row" role="rowheader">${esc(l.item)}</th>${LISTA.map(P => `<td role="cell"${topCls(P)}>${cell(l[P.id])}</td>`).join('')}</tr>`).join('')
   ).join('');
 
-  $('[data-pick]').innerHTML = LISTA.map(P => `<label class="pick__opt">
+  $('[data-pick]').innerHTML = LISTA.map((P, i) => `<label class="pick__opt">
       <input type="radio" name="plano" value="${P.id}"${P.id === TOP ? ' checked' : ''}>
-      <span class="pick__card">${P.destaque ? `<i>${esc(P.selo)}</i>` : ''}<b>${esc(P.nome)}</b><em>${C.brl(P.centavos)}</em><small>${esc(P.descricao)}</small></span>
+      <span class="pick__card">${P.destaque ? `<i>${esc(P.selo)}</i>` : ''}<span class="pick__n" aria-hidden="true">${numero(i)}</span><b>${esc(P.nome)}</b><em>${C.brl(P.centavos)}</em><span class="pick__terms">Pagamento único</span><small>${esc(P.descricao)}</small></span>
     </label>`).join('');
 
   /* ---------- entrada das seções ---------- */
@@ -201,7 +240,7 @@
       li.classList.toggle('is-active', i === n); li.classList.toggle('is-done', i < n);
       if (i === n) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
     });
-    $('[data-progress]', wiz).style.width = `${n * 25}%`;
+    $('[data-progress]', wiz).style.width = `${((n - 1) / (inds.length - 1)) * 100}%`;
     if (scroll) {
       const top = wiz.getBoundingClientRect().top + scrollY - header.offsetHeight - 16;
       scrollTo({ top, behavior: reduce() ? 'auto' : 'smooth' });
@@ -241,7 +280,7 @@
     return libsP;
   }
   let logoP = null;
-  const loadLogo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo-branco.png?v=2')
+  const loadLogo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=5')
     .then(r => (r.ok ? r.blob() : Promise.reject(new Error('logo'))))
     .then(b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); }))
     .then(async data => { const img = new Image(); img.src = data; await img.decode(); return { data, ratio: img.naturalWidth / img.naturalHeight }; })
@@ -520,7 +559,7 @@
     const x = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
     const badge = $('.done__badge', wiz).getBoundingClientRect();
     const ox = badge.left + badge.width / 2, oy = badge.top + badge.height / 2;
-    const cores = ['#9BFF00', '#9BFF00', '#FFFFFF', '#C8FF66'];
+    const cores = ['#0754FA', '#0754FA', '#FFFFFF', '#5C8DFF', '#080808'];
     const parts = Array.from({ length: 120 }, () => ({ x: ox, y: oy, vx: (Math.random() - .5) * 15, vy: Math.random() * -13 - 3, s: Math.random() * 7 + 3, r: Math.random() * 6, c: cores[Math.floor(Math.random() * cores.length)] }));
     const t0 = performance.now();
     (function tick(t) {

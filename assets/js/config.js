@@ -3,7 +3,7 @@
    FONTE ÚNICA: cards, tabela comparativa, contratação, contrato, PDF,
    Pix e conferência no servidor (api/contrato.js) leem daqui.
 
-   Valores sempre em CENTAVOS (inteiros): R$ 999,99 → 99999.
+   Valores sempre em CENTAVOS (inteiros): R$ 599,99 → 59999.
    Ao mudar um preço, rode `npm test`: ele aponta os textos estáticos do
    index.html (descrição, dados estruturados) que precisam acompanhar.
    ========================================================= */
@@ -37,13 +37,16 @@
   };
 
   /* Planos, na ordem em que aparecem no site (o do meio é o destaque).
-     centavos            → preço em centavos (inteiro)
+     centavos            → preço em centavos (inteiro), pagamento único
+     oferta              → selo da oferta junto do preço
+     chamada             → frase de destaque do card ({preco} vira o valor do plano)
+     chaves              → três recursos com ícone no topo do card (ícones do index.html: #i-<icone>)
      destaques           → itens do card (lista com check)
      entregas/naoInclui  → Anexo I do contrato
      prazo / prazoMax    → dias úteis de entrega / teto em alta demanda ou problemas técnicos
-     destaque: true      → card preto com borda verde e opção já marcada na contratação
+     destaque: true      → card azul e opção já marcada na contratação
      loja: true          → o contrato pede a lista de produtos
-     premium: true       → cláusulas do nome comercial e do escopo definido no briefing
+     premium: true       → card preto e cláusulas do nome comercial e do escopo definido no briefing
      suportePrioritario  → o contrato cita atendimento prioritário */
   const PLANOS = {
     essencial: {
@@ -53,7 +56,9 @@
       artigo: 'o',
       centavos: 59999,
       selo: 'Para começar',
+      oferta: 'Oferta especial',
       botao: 'Escolher Essencial',
+      chaves: [{ icone: 'doc', texto: 'Landing page' }, { icone: 'wa', texto: 'WhatsApp' }, { icone: 'globe', texto: 'Domínio por 1 ano' }],
       descricao: 'Uma presença digital profissional para clientes encontrarem sua empresa e entrarem em contato rapidamente.',
       ideal: 'autônomos, prestadores de serviço e negócios locais que querem começar',
       resumo: 'Landing page profissional de uma página para apresentar a empresa e levar o cliente direto para o WhatsApp.',
@@ -96,9 +101,11 @@
       nome: 'Loja Online',
       nomeCurto: 'Loja Online',
       artigo: 'a',
-      centavos: 99999,
+      centavos: 59999,
       selo: 'Mais escolhido',
+      oferta: 'Oferta especial',
       botao: 'Escolher Loja Online',
+      chaves: [{ icone: 'box', texto: 'Catálogo' }, { icone: 'cart', texto: 'Carrinho' }, { icone: 'card', texto: 'Pix e cartão' }],
       destaque: true,
       loja: true,
       descricao: 'Uma estrutura completa de vendas online para transformar visitantes em clientes.',
@@ -151,9 +158,12 @@
       nome: 'Sites de 10 Mil Profissionais',
       nomeCurto: 'Premium',
       artigo: 'o',
-      centavos: 159999,
+      centavos: 99999,
       selo: 'Experiência premium',
+      oferta: 'Oferta especial',
+      chamada: 'Seu projeto de alto padrão por {preco}.',
       botao: 'Escolher plano Premium',
+      chaves: [{ icone: 'spark', texto: 'Design exclusivo' }, { icone: 'layers', texto: 'Até 12 páginas' }, { icone: 'bars', texto: 'Animações' }],
       premium: true,
       suportePrioritario: true,
       descricao: 'Uma experiência digital exclusiva para empresas que exigem sofisticação, velocidade, tecnologia e uma presença online de alto padrão.',
@@ -245,12 +255,14 @@
 
   /* Portfólio. O primeiro projeto aparece em destaque (card grande).
      Para adicionar um projeto: rode `npm run print -- <url> <id>` (gera os prints em
-     assets/img/projetos/) e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido. */
+     assets/img/projetos/) e copie um dos blocos abaixo. "plano" é o id do plano indicado para um site parecido.
+     "categoria" alimenta o filtro do portfólio: 'loja' (Lojas online) ou 'institucional' (Institucionais). */
   const PROJETOS = [
     {
       id: 'kivora',
       nome: 'Kivora',
       tipo: 'Loja online',
+      categoria: 'loja',
       segmento: 'Marketplace de eletrônicos, casa e moda',
       url: 'https://www.kivorashop.com.br/',
       dominio: 'kivorashop.com.br',
@@ -264,6 +276,7 @@
       id: 'jesusnewjob',
       nome: 'Jesus New Job',
       tipo: 'Site institucional',
+      categoria: 'institucional',
       segmento: 'Comunicação visual · São Paulo',
       url: 'https://www.jesusnewjob.com.br/',
       dominio: 'jesusnewjob.com.br',
@@ -277,6 +290,7 @@
       id: 'oficinakeke',
       nome: 'Oficina Mecânica Keke',
       tipo: 'Site de oficina',
+      categoria: 'institucional',
       segmento: 'Oficina mecânica · Revisão, motor, freios e suspensão',
       url: 'https://oficina-keke.vercel.app/',
       dominio: 'oficina-keke.vercel.app',
@@ -290,6 +304,7 @@
       id: 'conectagoogle',
       nome: 'Conecta Google',
       tipo: 'Site de serviços',
+      categoria: 'institucional',
       segmento: 'Google Meu Negócio e plaquinhas NFC',
       url: 'https://conectagoogle.vercel.app/',
       dominio: 'conectagoogle.vercel.app',

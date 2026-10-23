@@ -294,20 +294,21 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
     const M = 20, PW = 210, PH = 297, CW = PW - 2 * M;
-    const INK = [17, 18, 20], MUTED = [104, 110, 122], LINE = [226, 229, 234], NEON = [155, 255, 0];
+    const INK = [17, 18, 20], MUTED = [104, 110, 122], LINE = [226, 229, 234], BLUE = [7, 84, 250];
     const clean = s => String(s).replace(/[  ]/g, ' ').replace(/[–—]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[•✦✓→]/g, '-');
     let y = M + 12;
+    // cabeçalho branco (econômico na impressão), logotipo azul e preto e filete azul
     const head = () => {
-      doc.setFillColor(8, 8, 8); doc.rect(0, 0, PW, 16, 'F');
-      doc.setFillColor(...NEON); doc.rect(0, 16, PW, 0.9, 'F');
-      if (c.logo) doc.addImage(c.logo.data, 'PNG', M, 5, 6 * c.logo.ratio, 6);
+      doc.setFillColor(...BLUE); doc.rect(0, 0, PW, 1.6, 'F');
+      if (c.logo) doc.addImage(c.logo.data, 'PNG', M, 6.2, 5.6 * c.logo.ratio, 5.6);
       else {
         doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
-        doc.setTextColor(255, 255, 255); doc.text('web', M, 10.6);
-        doc.setTextColor(...NEON); doc.text('ora', M + doc.getTextWidth('web'), 10.6);
+        doc.setTextColor(...BLUE); doc.text('web', M, 10.8);
+        doc.setTextColor(8, 8, 8); doc.text('ora', M + doc.getTextWidth('web'), 10.8);
       }
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(200, 203, 209);
-      doc.text(clean(`Contrato nº ${c.numero}`), PW - M, 9.8, { align: 'right' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+      doc.text(clean(`Contrato nº ${c.numero}`), PW - M, 10.2, { align: 'right' });
+      doc.setDrawColor(...LINE); doc.setLineWidth(0.3); doc.line(M, 16, PW - M, 16);
       doc.setTextColor(...INK);
     };
     const room = h => { if (y + h > PH - M - 4) { doc.addPage(); head(); y = M + 12; } };
@@ -323,7 +324,7 @@
         doc.text(lines, PW / 2, y, { align: 'center' }); y += lines.length * 4.2 + 5; doc.setTextColor(...INK);
       } else if (b.t === 'h') {
         room(14); y += 2.5;
-        doc.setFillColor(...NEON); doc.rect(M, y - 3.1, 1.1, 3.9, 'F');
+        doc.setFillColor(...BLUE); doc.rect(M, y - 3.1, 1.1, 3.9, 'F');
         doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
         doc.text(clean(b.text), M + 3.4, y); y += 5.5;
       } else if (b.t === 'li') {
@@ -342,7 +343,7 @@
       room(62); y += 4;
       doc.setDrawColor(...LINE); doc.roundedRect(M, y, CW, 56, 3, 3);
       doc.addImage(c.qr, 'PNG', M + 4, y + 4, 48, 48);
-      doc.setFillColor(...NEON); doc.rect(M + 58, y + 7, 1.1, 3.9, 'F');
+      doc.setFillColor(...BLUE); doc.rect(M + 58, y + 7, 1.1, 3.9, 'F');
       doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text('PAGAMENTO VIA PIX', M + 61.4, y + 10);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
       const info = [
