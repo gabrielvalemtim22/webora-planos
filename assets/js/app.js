@@ -280,7 +280,7 @@
     return libsP;
   }
   let logoP = null;
-  const loadLogo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=5')
+  const loadLogo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=6')
     .then(r => (r.ok ? r.blob() : Promise.reject(new Error('logo'))))
     .then(b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); }))
     .then(async data => { const img = new Image(); img.src = data; await img.decode(); return { data, ratio: img.naturalWidth / img.naturalHeight }; })

@@ -7,7 +7,7 @@
    sem mudar o desenho.
 
    Saída:
-     assets/img/marca/   símbolo (hexágono com contorno azul) e logotipo (preto: fundo claro;
+     assets/img/marca/   símbolo (quadrado azul com o hexágono) e logotipo (preto: fundo claro;
                          branco: fundo escuro), PNG do logotipo para o PDF
      favicon.ico, icon.png, icon-192.png, icon-maskable.png, apple-icon.png   (raiz do site)
      assets/img/og.jpg   imagem de compartilhamento (1200×630), a partir de scripts/og.html
@@ -113,23 +113,9 @@ async function processar({ simbolo, logotipo, blue, black }) {
     e[i + 3] = a < .04 ? 0 : Math.round(Math.min(1, a) * 255);
   }
   const eb = bbox(em, (dd, i) => dd[i + 3] > 8);
-  const emblemaW = eb.w;
-  // emblema recortado num quadrado com folga para o contorno azul
-  const ring = Math.round(emblemaW * .075), side = Math.round(Math.max(eb.w, eb.h) + ring * 2 + 8);
-  const emblema = canvas(side, side);
-  emblema.getContext('2d').drawImage(toCanvas(em), eb.x0, eb.y0, eb.w, eb.h, Math.round((side - eb.w) / 2), Math.round((side - eb.h) / 2), eb.w, eb.h);
-  // silhueta azul, usada para o contorno (dilatação por carimbos em círculo)
-  const sil = canvas(side, side), sx = sil.getContext('2d');
-  sx.drawImage(emblema, 0, 0); sx.globalCompositeOperation = 'source-in'; sx.fillStyle = hex(blue); sx.fillRect(0, 0, side, side);
-  const marca = canvas(side, side), mx = marca.getContext('2d');
-  for (let a = 0; a < 360; a += 3) for (const k of [.34, .67, 1]) mx.drawImage(sil, Math.cos(a * Math.PI / 180) * ring * k, Math.sin(a * Math.PI / 180) * ring * k);
-  mx.drawImage(emblema, 0, 0);
-  const mb = bbox(mx.getImageData(0, 0, side, side), (dd, i) => dd[i + 3] > 8);
-  const mside = Math.max(mb.w, mb.h) + 4;
-  const simb = canvas(mside, mside);
-  simb.getContext('2d').drawImage(marca, mb.x0, mb.y0, mb.w, mb.h, Math.round((mside - mb.w) / 2), Math.round((mside - mb.h) / 2), mb.w, mb.h);
 
-  // ícones: emblema sobre o azul (quadrado arredondado ou inteiro)
+  // símbolo e ícones: o desenho original (emblema sobre o quadrado azul), com cantos
+  // arredondados no site, na aba e no app, ou inteiro onde o sistema arredonda (iPhone, Android)
   const tile = (size, scale, raio) => {
     const out = canvas(size, size), x = out.getContext('2d');
     x.fillStyle = hex(blue);
@@ -167,7 +153,7 @@ async function processar({ simbolo, logotipo, blue, black }) {
     fundo: bg.map(Math.round),
     soltos: soltos.length ? `${soltos.length} (maior: ${Math.max(...soltos)} px)` : '0',
     ratio: lw / lh,
-    simbolo: url(resize(simb, 192, 192), 'image/webp', .92),
+    simbolo: url(tile(192, .66, .22), 'image/webp', .92),
     icon512: url(tile(512, .66, .22)),
     icon192: url(tile(192, .68, .22)),
     maskable: url(tile(512, .54, 0)),

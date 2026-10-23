@@ -38,7 +38,7 @@ assets/js/config.js        dados da Webora, dos planos e dos projetos (edite aqu
 assets/js/contrato.js      contrato, valores, validação, Pix e PDF (navegador e servidor)
 assets/js/app.js           página, vitrine, planos, comparação e assistente de contratação
 api/contrato.js            conferência do contrato no servidor (Vercel Function)
-assets/img/marca/          símbolo (hexágono com contorno azul) e logotipo (azul+preto e azul+branco)
+assets/img/marca/          símbolo (quadrado azul com o hexágono) e logotipo (azul+preto e azul+branco)
 favicon.ico, icon*.png     ícones da aba, do app e do iPhone (apple-icon.png)
 marca/                     imagens originais da marca enviadas pela Webora (não vão para o site)
 scripts/                   servidor local, gerador da marca e modelo da imagem de compartilhamento
@@ -67,6 +67,6 @@ npm run marca   # regenera logotipo, favicons e assets/img/og.jpg a partir de ma
 
 - Domínio canônico: `https://www.weborasites.com.br/` (o endereço sem `www` redireciona para ele). O endereço `webora-planos.vercel.app` redireciona para o domínio.
 - `sitemap.xml`, `robots.txt`, Open Graph, Twitter/X Cards e dados estruturados (Organization, WebSite e Service com as ofertas).
-- As imagens ficam 7 dias em cache no navegador (`vercel.json`). Ao trocar uma imagem, salve com outro nome ou aumente o número de versão (`?v=5`) no endereço.
+- As imagens ficam 7 dias em cache no navegador (`vercel.json`). Ao trocar uma imagem, salve com outro nome ou aumente o número de versão (`?v=6`) no endereço.
 
 Publicação: cada `git push` na branch `main` atualiza o site na Vercel.
