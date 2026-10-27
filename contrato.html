@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Via do contrato | Webora</title>
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" href="/favicon.ico?v=6" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="/icon.png?v=6" type="image/png" sizes="512x512">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
+  <link rel="stylesheet" href="/assets/css/style.css?v=8">
+  <link rel="stylesheet" href="/assets/css/painel.css?v=8">
+  <script src="/assets/js/config.js?v=8" defer></script>
+  <script src="/assets/js/contrato.js?v=8" defer></script>
+  <script src="/assets/js/documento.js?v=8" defer></script>
+  <script src="/assets/js/via.js?v=8" defer></script>
+</head>
+<body class="pg">
+  <header class="pg__head">
+    <a class="pg__brand" href="/"><img src="/assets/img/marca/webora-logotipo-preto.webp?v=6" alt="Webora" width="112" height="27"></a>
+    <span class="pg__tag">Via do contrato</span>
+  </header>
+  <main class="pg__main">
+    <p class="pg__status" data-status role="status">Abrindo o seu contrato…</p>
+    <section class="via" data-via hidden aria-labelledby="via-title">
+      <div class="via__head">
+        <div>
+          <p class="eyebrow eyebrow--pill">Contrato assinado</p>
+          <h1 class="via__title" id="via-title" data-v="titulo"></h1>
+          <p class="via__meta" data-v="meta"></p>
+        </div>
+        <div class="via__actions">
+          <button class="btn btn--primary" type="button" data-act="salvar">Salvar PDF</button>
+          <button class="btn btn--ghost-blue" type="button" data-act="imprimir">Imprimir</button>
+          <button class="btn btn--ghost-blue" type="button" data-act="compartilhar" hidden>Compartilhar</button>
+        </div>
+      </div>
+      <p class="msg msg--err" data-err role="alert"></p>
+      <dl class="facts2" data-facts></dl>
+      <div class="paper"><div class="paper__body" data-paper role="document" aria-label="Texto do contrato"></div></div>
+      <div class="sigbox">
+        <span data-sig></span>
+        <b data-v="assinante"></b>
+        <small data-v="registro"></small>
+      </div>
+      <p class="msg">Dúvidas sobre o contrato? Fale com a Webora pelo WhatsApp <a href="https://wa.me/5511959304102" target="_blank" rel="noopener">(11) 95930-4102</a>.</p>
+    </section>
+  </main>
+</body>
+</html>

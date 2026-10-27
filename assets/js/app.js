@@ -366,29 +366,9 @@
   $$('[data-next]', wiz).forEach(b => b.addEventListener('click', () => go(state.step + 1)));
   $$('[data-prev]', wiz).forEach(b => b.addEventListener('click', () => go(state.step - 1)));
 
-  /* ---------- bibliotecas do QR Code e do PDF: só quando precisar ---------- */
-  const LIBS = [
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js', sri: 'sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1', ok: () => typeof window.qrcode === 'function' },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', sri: 'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk', ok: () => !!(window.jspdf && window.jspdf.jsPDF) }
-  ];
-  let libsP = null;
-  function loadLibs() {
-    if (!libsP) {
-      libsP = Promise.all(LIBS.map(l => l.ok() ? null : new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.src = l.src; s.async = true; s.integrity = l.sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer';
-        s.onload = res; s.onerror = () => { s.remove(); rej(new Error(`Falha ao carregar ${l.src}`)); };
-        document.head.append(s);
-      }))).catch(e => { libsP = null; throw e; });
-    }
-    return libsP;
-  }
-  let logoP = null;
-  const loadLogo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=6')
-    .then(r => (r.ok ? r.blob() : Promise.reject(new Error('logo'))))
-    .then(b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); }))
-    .then(async data => { const img = new Image(); img.src = data; await img.decode(); return { data, ratio: img.naturalWidth / img.naturalHeight }; })
-    .catch(() => { logoP = null; return null; }));
+  /* ---------- QR Code e PDF (documento.js): bibliotecas só quando precisar ---------- */
+  const Doc = window.WeboraDoc;
+  const loadLibs = () => Doc.carregar();
 
   /* ---------- rascunho ---------- */
   function saveDraft() {
@@ -495,12 +475,14 @@
   /* ---------- conferência no servidor (api/contrato.js) ----------
      O servidor recalcula os valores a partir da mesma tabela de planos e valida os dados.
      Se os valores divergirem (página desatualizada), a assinatura é bloqueada.
-     Se o servidor não responder, a contratação segue com os valores locais. */
-  async function conferir(d, pg, hash) {
-    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 8000);
+     Se o servidor não responder, a contratação segue com os valores locais.
+     Junto vai a assinatura: o servidor guarda o contrato para o painel da Webora e devolve
+     o link da via do cliente. */
+  async function conferir(d, pg, hash, assinado) {
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 12000);
     try {
-      const body = { plano: d.plano, pagamento: d.pagamento, numero: d.numero, hash };
-      REQ.forEach(k => { body[k] = d[k]; });
+      const body = { plano: d.plano, pagamento: d.pagamento, numero: d.numero, hash, dataLonga: d.dataLonga, ...assinado };
+      FIELDS.forEach(k => { body[k] = d[k]; });
       const r = await fetch('/api/contrato', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl.signal, cache: 'no-store' });
       if (r.status === 400 || r.status === 422) {
         const j = await r.json().catch(() => ({}));
@@ -511,7 +493,7 @@
       const j = await r.json();
       const p = j.pagamento || {};
       if (p.total !== pg.total || p.agora !== pg.agora || p.depois !== pg.depois) return { status: 'divergente' };
-      return { status: 'ok', conferidoEm: j.conferidoEm, recibo: j.recibo || null };
+      return { status: 'ok', conferidoEm: j.conferidoEm, recibo: j.recibo || null, via: j.via || null };
     } catch (e) {
       return null;
     } finally { clearTimeout(timer); }
@@ -531,7 +513,7 @@
       const assinadoEm = C.dataHora(quando);
       const text = C.toText(b.blocks) + `\nAssinado eletronicamente por ${d.nome} (${b.docTipo} ${C.maskDoc(d.doc)}) em ${assinadoEm}.\n` + assinatura;
       const hash = await C.sha256(text);
-      const [servidor] = await Promise.all([conferir(d, b.pagamento, hash), loadLibs()]);
+      const [servidor] = await Promise.all([conferir(d, b.pagamento, hash, { assinatura, assinadoEm }), loadLibs()]);
       if (servidor && servidor.status === 'divergente') { err.textContent = 'Os valores dos planos foram atualizados. Recarregue a página para assinar com os valores corretos.'; return; }
       if (servidor && servidor.status === 'invalido') { err.textContent = servidor.mensagem; if (servidor.voltar) go(2); return; }
       const pix = C.pixWebora(b.pagamento.agora, d.numero);
@@ -540,8 +522,9 @@
         plano: { id: P.id, nome: P.nome, centavos: P.centavos, prazo: P.prazo, prazoMax: P.prazoMax },
         blocks: b.blocks, docTipo: b.docTipo, pagamento: b.pagamento,
         assinatura, assinadoEm, hash, codigo: hash.slice(0, 16).match(/.{4}/g).join('-'),
-        pix, qr: qrCanvas(pix).toDataURL('image/png'),
-        servidor: servidor && servidor.status === 'ok' ? { conferidoEm: servidor.conferidoEm, recibo: servidor.recibo } : null
+        pix, qr: Doc.qr(pix),
+        servidor: servidor && servidor.status === 'ok' ? { conferidoEm: servidor.conferidoEm, recibo: servidor.recibo } : null,
+        via: servidor && servidor.status === 'ok' ? servidor.via : null
       };
       store.set(SIGNED, state.signed);
       showDone();
@@ -567,15 +550,6 @@
     return outC.toDataURL('image/png');
   }
 
-  function qrCanvas(text) {
-    const q = window.qrcode(0, 'M'); q.addData(text); q.make();
-    const n = q.getModuleCount(), cellSize = 8, quiet = 2, size = (n + quiet * 2) * cellSize;
-    const cv = document.createElement('canvas'); cv.width = cv.height = size;
-    const x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, size, size); x.fillStyle = '#080808';
-    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) x.fillRect((c + quiet) * cellSize, (r + quiet) * cellSize, cellSize, cellSize);
-    return cv;
-  }
-
   function showDone() {
     const s = state.signed, P = s.plano;
     const curto = s.assinadoEm.replace(' (horário de Brasília)', '');
@@ -595,6 +569,10 @@
     const box = $('[data-qr]', wiz); box.replaceChildren();
     const img = new Image(); img.src = s.qr; img.alt = `QR Code Pix de ${C.brl(s.pagamento.agora)}`; box.append(img);
     $('[data-pdf-err]', wiz).textContent = '';
+    // a via do cliente: link permanente (quando o servidor guardou) e compartilhar, se o aparelho permitir
+    $('[data-via-box]', wiz).hidden = !s.via;
+    $('[data-out-input="via"]', wiz).value = s.via || '';
+    $('[data-share]', wiz).hidden = !Doc.podeCompartilhar();
     const msg = [
       'Olá, Webora! Acabei de assinar o contrato pelo site.', '',
       `Contrato: ${s.numero}`,
@@ -604,38 +582,40 @@
       `Pagamento: ${s.pagamento.rotulo}`,
       `Valor a pagar agora: ${C.brl(s.pagamento.agora)}`,
       `Código de verificação: ${s.codigo}`,
-      s.servidor && s.servidor.recibo ? `Recibo do servidor: ${s.servidor.recibo}` : null, '',
+      s.servidor && s.servidor.recibo ? `Recibo do servidor: ${s.servidor.recibo}` : null,
+      s.via ? `Via do contrato: ${s.via}` : null, '',
       'Vou enviar o comprovante do Pix e o PDF do contrato.'
     ].filter(l => l !== null).join('\n');
     $('[data-send]', wiz).href = wa(msg);
   }
 
-  /* ---------- PDF, cópia do Pix e acompanhamento ---------- */
-  const fileName = () => `Contrato-Webora-${state.signed.numero}.pdf`;
-  $('[data-pdf]', wiz).addEventListener('click', async e => {
-    const btn = e.currentTarget, errEl = $('[data-pdf-err]', wiz);
-    errEl.textContent = '';
-    busy(btn, true, 'Gerando PDF…');
-    try {
-      const [, logo] = await Promise.all([loadLibs(), loadLogo()]);
-      const s = state.signed;
-      const doc = C.pdf({ ...s, logo, servidor: s.servidor ? { ...s.servidor, conferidoEmTexto: C.dataHora(new Date(s.servidor.conferidoEm)) } : null });
-      // no celular, oferece compartilhar o PDF direto (WhatsApp, e-mail…)
-      const file = new File([doc.output('blob')], fileName(), { type: 'application/pdf' });
-      if (navigator.canShare && navigator.canShare({ files: [file] }) && matchMedia('(pointer: coarse)').matches) {
-        try { await navigator.share({ files: [file], title: 'Contrato Webora', text: `Contrato ${s.numero} assinado.` }); return; } catch (ex) { if (ex.name === 'AbortError') return; }
-      }
-      doc.save(fileName());
-    } catch (ex) {
-      errEl.textContent = 'Não foi possível gerar o PDF. Verifique sua conexão e tente novamente.';
-      console.error(ex);
-    } finally { busy(btn, false); }
-  });
-  $('[data-copy]', wiz).addEventListener('click', async e => {
-    const input = $('[data-out-input="pix"]', wiz), b = e.currentTarget, label = $('span', b);
-    try { await navigator.clipboard.writeText(input.value); } catch (err) { input.select(); document.execCommand('copy'); }
-    label.textContent = 'Copiado!'; setTimeout(() => { label.textContent = 'Copiar'; }, 1800);
-  });
+  /* ---------- via do cliente: salvar, imprimir, compartilhar; cópia do Pix ---------- */
+  // abrir = função chamada no clique, antes de qualquer espera (a aba da impressão precisa nascer do clique)
+  function viaAcao(sel, label, acao, abrir) {
+    $(sel, wiz).addEventListener('click', async e => {
+      const btn = e.currentTarget, errEl = $('[data-pdf-err]', wiz);
+      const janela = abrir ? abrir() : null;
+      errEl.textContent = '';
+      busy(btn, true, label);
+      try { await acao(state.signed, janela); } catch (ex) {
+        if (janela) janela.close();
+        errEl.textContent = 'Não foi possível gerar o PDF. Verifique sua conexão e tente novamente.';
+        console.error(ex);
+      } finally { busy(btn, false); }
+    });
+  }
+  viaAcao('[data-pdf]', 'Gerando PDF…', s => Doc.salvar(s));
+  viaAcao('[data-print]', 'Preparando…', (s, janela) => Doc.imprimir(s, janela), Doc.abrirJanela);
+  viaAcao('[data-share]', 'Preparando…', s => Doc.compartilhar(s));
+  function copiar(sel, inputSel) {
+    $(sel, wiz).addEventListener('click', async e => {
+      const input = $(inputSel, wiz), label = $('span', e.currentTarget), antes = label.textContent;
+      try { await navigator.clipboard.writeText(input.value); } catch (err) { input.select(); document.execCommand('copy'); }
+      label.textContent = 'Copiado!'; setTimeout(() => { label.textContent = antes; }, 1800);
+    });
+  }
+  copiar('[data-copy]', '[data-out-input="pix"]');
+  copiar('[data-copy-via]', '[data-out-input="via"]');
 
   function showResume() {
     const s = store.get(SIGNED), box = $('[data-resume]', wiz);

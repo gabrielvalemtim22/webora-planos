@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Painel de contratos | Webora</title>
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="icon" href="/favicon.ico?v=6" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="/icon.png?v=6" type="image/png" sizes="512x512">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
+  <link rel="stylesheet" href="/assets/css/style.css?v=8">
+  <link rel="stylesheet" href="/assets/css/painel.css?v=8">
+  <script src="/assets/js/config.js?v=8" defer></script>
+  <script src="/assets/js/contrato.js?v=8" defer></script>
+  <script src="/assets/js/documento.js?v=8" defer></script>
+  <script src="/assets/js/admin.js?v=8" defer></script>
+</head>
+<body class="pg">
+  <header class="pg__head">
+    <a class="pg__brand" href="/"><img src="/assets/img/marca/webora-logotipo-preto.webp?v=6" alt="Webora" width="112" height="27"></a>
+    <span class="pg__tag">Painel de contratos</span>
+    <div class="pg__tools" data-tools hidden>
+      <button class="btn btn--light btn--sm" type="button" data-refresh>Atualizar</button>
+      <button class="btn btn--light btn--sm" type="button" data-logout>Sair</button>
+    </div>
+  </header>
+
+  <main class="pg__main">
+    <form class="login" data-login novalidate>
+      <h1>Painel da Webora</h1>
+      <p>Veja quem assinou, o plano, os valores e envie a via do contrato pelo WhatsApp.</p>
+      <label class="fld">Senha do painel
+        <input type="password" name="senha" autocomplete="current-password" required>
+      </label>
+      <button class="btn btn--primary btn--lg" type="submit">Entrar</button>
+      <p class="msg msg--err" data-login-err role="alert"></p>
+    </form>
+
+    <section class="adm" data-adm hidden aria-label="Contratos assinados">
+      <div class="stats">
+        <div class="stat"><small>Contratos assinados</small><b data-stat="total">0</b></div>
+        <div class="stat"><small>Valor contratado</small><b data-stat="valor">R$ 0,00</b></div>
+        <div class="stat"><small>Aguardando Pix</small><b data-stat="aguardando">0</b></div>
+        <div class="stat"><small>Entregues</small><b data-stat="entregues">0</b></div>
+      </div>
+      <div class="tools">
+        <input class="tools__q" type="search" data-q placeholder="Buscar por nome, empresa, CPF/CNPJ ou nº do contrato" aria-label="Buscar contratos">
+        <select data-f-plano aria-label="Filtrar por plano"><option value="">Todos os planos</option></select>
+        <select data-f-status aria-label="Filtrar por status"><option value="">Todos os status</option></select>
+        <button class="btn btn--light" type="button" data-csv>Exportar planilha</button>
+      </div>
+      <p class="msg msg--err" data-err role="alert"></p>
+      <div class="list" data-list></div>
+    </section>
+
+    <dialog class="det" data-det aria-labelledby="det-title">
+      <div class="det__head">
+        <div><h2 id="det-title" data-d="titulo"></h2><p data-d="sub"></p></div>
+        <button class="det__x" type="button" data-close aria-label="Fechar">×</button>
+      </div>
+      <div class="det__body" data-d="corpo"></div>
+    </dialog>
+  </main>
+</body>
+</html>

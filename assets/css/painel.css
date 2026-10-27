@@ -1,0 +1,118 @@
+/* =========================================================
+   Webora — via do contrato (/contrato) e painel de contratos (/admin)
+   Usa os tokens e componentes de style.css (cores, botões, papel do contrato).
+   ========================================================= */
+.pg { min-height: 100vh; background: var(--gray-50); }
+.pg__head { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px var(--gutter); background: #fff; border-bottom: 1px solid var(--border); }
+.pg__brand img { width: 112px; height: auto; }
+.pg__tag { padding-left: 14px; border-left: 1px solid var(--border); color: var(--gray-600); font-size: 14px; font-weight: 600; }
+.pg__tools { display: flex; gap: 8px; margin-left: auto; }
+.pg__main { width: min(100%, 1180px); margin: 0 auto; padding: clamp(20px, 4vw, 40px) var(--gutter) 64px; }
+.pg__status { padding: 40px 0; color: var(--gray-600); text-align: center; }
+.btn--light { color: var(--text); border-color: var(--border); background: #fff; }
+.btn--light:hover { border-color: var(--blue); color: var(--blue); }
+.btn--danger { color: var(--danger-dark); border-color: #F3C4CC; background: #fff; }
+.btn--danger:hover { background: #FFF3F5; }
+.pg .btn .i { font-size: 18px; }
+
+/* ---------- via do contrato ---------- */
+.via { display: grid; gap: 18px; }
+.via__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.via__title { margin-top: 10px; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; }
+.via__meta { margin-top: 6px; color: var(--gray-600); }
+.via__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.facts2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; overflow: hidden; border-radius: 18px; border: 1px solid var(--border); background: var(--border); }
+.facts2 div { padding: 14px 16px; background: #fff; }
+.facts2 dt { color: var(--gray-600); font-size: 12.5px; font-weight: 600; }
+.facts2 dd { margin-top: 2px; font-weight: 700; overflow-wrap: anywhere; }
+.via .paper__body { max-height: none; overflow: visible; }
+.sigbox { display: grid; gap: 6px; justify-items: start; padding: 18px 20px; border-radius: 18px; border: 1px solid var(--border); background: #fff; }
+.sigbox img { width: min(100%, 300px); height: auto; border-bottom: 1px solid var(--gray-700); }
+.sigbox b { font-size: 15px; }
+.sigbox small { color: var(--gray-600); font-size: 13px; overflow-wrap: anywhere; }
+.msg { color: var(--gray-600); font-size: 14px; }
+.msg--err { color: var(--danger-dark); }
+.msg:empty { display: none; }
+
+/* ---------- painel: entrada ---------- */
+.login { display: grid; gap: 14px; width: min(100%, 400px); margin: clamp(24px, 8vh, 90px) auto 0; padding: clamp(24px, 4vw, 36px); border-radius: 24px; border: 1px solid var(--border); background: #fff; box-shadow: var(--shadow); }
+.login h1 { font-size: 26px; font-weight: 800; letter-spacing: -.03em; }
+.login p { color: var(--gray-600); }
+.fld { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.fld input, .fld select, .fld textarea, .tools input, .tools select { width: 100%; min-height: 46px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--gray-300); background: #fff; font-weight: 500; }
+.fld textarea { min-height: 84px; resize: vertical; }
+.fld input:focus, .fld select:focus, .fld textarea:focus, .tools input:focus, .tools select:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue); }
+
+/* ---------- painel: números, filtros e lista ---------- */
+.adm { display: grid; gap: 18px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.stat { padding: 16px 18px; border-radius: 18px; border: 1px solid var(--border); background: #fff; }
+.stat small { display: block; color: var(--gray-600); font-size: 13px; font-weight: 600; }
+.stat b { display: block; margin-top: 4px; font-size: clamp(22px, 2.4vw, 28px); font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.tools { display: grid; grid-template-columns: minmax(0, 1fr) 190px 210px auto; gap: 10px; }
+.list { overflow: hidden; border-radius: 18px; border: 1px solid var(--border); background: #fff; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.tbl th { padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--gray-50); color: var(--gray-600); font-size: 12.5px; font-weight: 700; text-align: left; white-space: nowrap; }
+.tbl td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl tbody tr { cursor: pointer; transition: background-color .2s; }
+.tbl tbody tr:hover { background: var(--blue-50); }
+.tbl .num { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+.tbl .val { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.who b { display: block; }
+.who small { display: block; color: var(--gray-600); font-size: 13px; }
+.empty { padding: 40px 20px; color: var(--gray-600); text-align: center; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.chip::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip--assinado { background: #FFF6E0; color: #8A5A00; }
+.chip--entrada { background: var(--blue-50); color: var(--blue-700); }
+.chip--pago { background: #E6F6EC; color: #1E6B3A; }
+.chip--producao { background: #EEF0FF; color: #3B3FB3; }
+.chip--entregue { background: #E6F6EC; color: #135C2E; }
+.chip--cancelado { background: var(--gray-100); color: var(--gray-600); }
+
+/* ---------- painel: contrato aberto ---------- */
+.det { width: min(100% - 24px, 860px); max-height: min(100% - 24px, 920px); padding: 0; border: 0; border-radius: 24px; background: var(--gray-50); color: var(--text); box-shadow: 0 40px 90px -30px rgba(8, 8, 8, .5); }
+.det::backdrop { background: rgba(8, 8, 8, .45); }
+.det__head { position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 18px 22px; background: #fff; border-bottom: 1px solid var(--border); }
+.det__head h2 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; }
+.det__head p { color: var(--gray-600); font-size: 13.5px; }
+.det__x { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--border); background: #fff; font-size: 20px; line-height: 1; }
+.det__body { display: grid; gap: 16px; padding: 18px 22px 24px; }
+.card { padding: 16px 18px; border-radius: 18px; border: 1px solid var(--border); background: #fff; }
+.card h3 { margin-bottom: 10px; font-size: 15px; font-weight: 800; }
+.kv { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 6px 14px; font-size: 14.5px; }
+.kv dt { color: var(--gray-600); }
+.kv dd { overflow-wrap: anywhere; }
+.kv a { color: var(--blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.acts { display: flex; flex-wrap: wrap; gap: 10px; }
+.status-form { display: grid; grid-template-columns: 220px minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.hist { display: grid; gap: 8px; margin-top: 12px; font-size: 14px; }
+.hist li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.hist small { color: var(--gray-600); }
+.ok-tag { color: #1E6B3A; font-weight: 700; }
+.warn-tag { color: #8A5A00; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tools { grid-template-columns: 1fr 1fr; }
+  .tools .tools__q { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  .pg__tag { display: none; }
+  .tbl thead { display: none; }
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl tr { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .tbl td { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; }
+  .tbl td::before { content: attr(data-label); color: var(--gray-600); font-size: 13px; }
+  .tbl td.who { display: block; padding-bottom: 6px; }
+  .tbl td.who::before { content: none; }
+  .kv { grid-template-columns: 1fr; gap: 0; }
+  .kv dd { margin-bottom: 8px; }
+  .status-form { grid-template-columns: 1fr; }
+  .det { width: 100%; max-width: 100%; max-height: 100%; height: 100%; border-radius: 0; }
+}
+@media print {
+  .pg__head, .via__actions, .pg__tools { display: none !important; }
+  .pg { background: #fff; }
+}

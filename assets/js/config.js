@@ -33,7 +33,7 @@
       cidade: 'SAO PAULO'                // até 15 letras, sem acento
     },
     foro: 'São Paulo/SP',
-    versaoContrato: '5.0'
+    versaoContrato: '5.1'
   };
 
   /* Planos, na ordem em que aparecem no site (o do meio é o destaque).

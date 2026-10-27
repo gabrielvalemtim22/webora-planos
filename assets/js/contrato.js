@@ -158,10 +158,18 @@
   // Blocos: page | meta | h | p | hl | field | check | note | sign | li
   // page abre uma página do contrato (no PDF, cada uma cabe numa folha); field é um campo do modelo,
   // já preenchido; em p, `bold` lista os trechos em negrito (só textos fixos, nunca dados do cliente).
-  // Os textos seguem o modelo da Webora; preço, revisões, suporte e prazo vêm do plano (config.js).
+  // Os textos seguem os modelos da Webora: um por plano (Essencial, Loja Online, Personalizado),
+  // com as cláusulas de pagamento à vista ou 50% + 50%; preço, revisões, suporte e prazo vêm do plano (config.js).
+  // Um plano novo, sem modelo próprio, usa o modelo conjunto "site ou loja online", com a modalidade marcada.
   const SITE_CURTO = 'weborasites.com.br';
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  const rodape = P => (P && P.premium ? 'Site Personalizado' : 'Essencial ou Loja Online');
+  const MODELO = {
+    essencial: { titulo: 'Contrato de criação de site essencial', rodape: 'Plano Essencial' },
+    loja: { titulo: 'Contrato de criação de loja online', rodape: 'Loja Online' },
+    premium: { titulo: 'Contrato de criação de site personalizado', rodape: 'Site Personalizado' }
+  };
+  const modelo = P => (P && MODELO[P.id]) || { titulo: 'Contrato de criação de site ou loja online', rodape: 'Essencial ou Loja Online' };
+  const rodape = P => modelo(P).rodape;
 
   function build(d) {
     const P = PLANOS[d.plano];
@@ -173,7 +181,7 @@
     const B = [];
     const add = (t, text, x) => B.push(Object.assign({ t, text }, x));
 
-    add('page', P.premium ? 'Contrato de criação de site personalizado' : 'Contrato de criação de site ou loja online');
+    add('page', modelo(P).titulo);
     add('meta', `Contrato nº ${d.numero} · Plano ${P.nome} · Modelo versão ${W.versaoContrato} · ${d.dataLonga}`);
     add('p', 'As partes abaixo contratam o desenvolvimento do projeto descrito neste instrumento. Os campos de identificação, escopo e prazo devem ser preenchidos e conferidos antes da assinatura.');
 
@@ -188,11 +196,15 @@
     add('h', '2 Valor e pagamento');
     const total = `Preço total do desenvolvimento: ${preco}`;
     add('p', `${total} (${extenso(pg.total)}). ` + (avista
-      ? 'Pagamento à vista, em parcela única via Pix na assinatura. A publicação e a entrega dos acessos ocorrem após a aprovação expressa da versão final.'
+      ? 'Pagamento integral antecipado, em parcela única na assinatura deste contrato.'
       : 'Pagamento em duas etapas: entrada na assinatura e saldo após aprovação expressa da versão final, antes da publicação e entrega dos acessos.'), { bold: [total] });
-    add('hl', avista ? `À vista na assinatura: ${preco}` : `Entrada: ${brl(pg.agora)}  |  Saldo na entrega: ${brl(pg.depois)}`);
-    if (!avista) {
+    if (avista) {
+      add('hl', P.id === 'essencial' ? `Pagamento à vista: ${preco}  |  Saldo: ${brl(0)}` : `Entrada integral: ${preco}  |  Saldo na entrega: ${brl(0)}`);
+      add('p', 'O pagamento na assinatura corresponde a 100% do valor do desenvolvimento. Não haverá segunda parcela ou cobrança de saldo na entrega.');
+    } else {
+      add('hl', `Entrada: ${brl(pg.agora)}  |  Saldo na entrega: ${brl(pg.depois)}`);
       add('p', pg.agora === pg.depois ? 'Cada parcela corresponde a 50% do valor total.'
+        : P.loja ? `Pagamento de 50% na entrada e 50% na entrega, com ajuste de arredondamento de um centavo entre as parcelas para preservar o total de ${preco}.`
         : 'A divisão corresponde a 50% de entrada e 50% na entrega, com arredondamento de um centavo na entrada e compensação no saldo.');
     }
     add('field', `Pix · chave ${W.pix.tipo} ${W.pix.chaveFormatada} · beneficiário ${W.responsavel} (${W.marca}). Quando o banco permitir, informe o nº do contrato (${d.numero}) na mensagem do Pix.`,
@@ -204,6 +216,12 @@
     if (P.premium) {
       add('p', `Modalidade: Site Personalizado, comercialmente denominado ${P.nome}. Esse nome não altera o preço total de ${preco} nem representa uma avaliação de mercado ou garantia de resultado.`, { bold: ['Site Personalizado', P.nome] });
       add('p', 'Inclui criação de layout conforme identidade visual fornecida, adaptação para celular e computador, navegação entre as páginas contratadas, canais de contato e configuração técnica básica de títulos e descrições para buscadores. Recursos exclusivos serão descritos abaixo.');
+    } else if (P.id === 'essencial') {
+      add('p', 'Modalidade contratada: Plano Essencial. Inclui uma página de apresentação do negócio, com seções de serviços ou produtos, informações de contato e botão para WhatsApp, adaptada para celular e computador conforme a identidade visual fornecida.', { bold: ['Plano Essencial'] });
+      add('p', `O valor do desenvolvimento é ${preco}. Este plano não inclui loja virtual com carrinho, checkout, gestão de pedidos, estoque ou integrações de pagamento. Qualquer ampliação será objeto de orçamento e aceite prévios.`);
+    } else if (P.loja) {
+      add('p', 'Modalidade contratada: Loja Online. Inclui vitrine de produtos, adaptação para celular e computador e aplicação da identidade visual fornecida. A quantidade de produtos e o fluxo de pedidos devem constar abaixo.', { bold: ['Loja Online'] });
+      add('p', `Indicar se os pedidos seguem para WhatsApp ou se há checkout integrado. Integrações de pagamento, cálculo de frete, estoque e painel administrativo só integram a entrega quando expressamente descritos no escopo. O valor do desenvolvimento é ${preco}.`);
     } else {
       add('p', `Marcar somente uma modalidade. O preço de ${preco} remunera a opção escolhida, conforme os limites e recursos registrados abaixo.`);
       add('check', 'Plano Essencial  |  Página de apresentação com contato e WhatsApp', { on: P.id === 'essencial' });
@@ -223,15 +241,18 @@
     add('p', 'Sem contratação expressa, domínio, hospedagem, assinaturas, taxas de meios de pagamento, manutenção contínua, produção de textos e fotos, anúncios e integrações adicionais não compõem o preço acima. Não há mensalidade de desenvolvimento instituída por este contrato.');
 
     add('h', '4 Prazo e aprovação');
-    const confirmacao = avista ? 'do pagamento' : 'da entrada';
+    const confirmacao = avista ? 'do pagamento integral' : 'da entrada';
     add('field', `Até ${dias(P.prazo)}` +
       (prazoMax ? `, ou até ${dias(prazoMax)} em períodos de alta demanda ou em caso de problemas técnicos, com aviso pelo WhatsApp` : '') +
       (P.premium ? '. Neste plano, o prazo conta também da aprovação do briefing com o mapa de páginas' : '') +
-      `. A data prevista será informada por escrito pela CONTRATADA ao confirmar ${avista ? 'o pagamento' : 'a entrada'} e o recebimento dos materiais.`,
+      `. A data prevista será informada por escrito pela CONTRATADA ao confirmar ${avista ? 'o pagamento integral' : 'a entrada'} e o recebimento dos materiais.`,
       { label: 'Prazo de entrega em dias úteis e data prevista | Preencher antes de assinar', rows: 2 });
     add('p', `O prazo começa no primeiro dia útil após a confirmação ${confirmacao} e o recebimento dos materiais e acessos indispensáveis. Pendências do cliente suspendem apenas as atividades afetadas; a Webora informará o impacto e a nova previsão por escrito.`);
     add('p', `A Webora apresentará uma prévia e realizará até ${feminino(porExtenso(P.revisoes))} ${P.revisoes === 1 ? 'rodada' : 'rodadas'} de ajustes dentro do escopo. O cliente deverá reunir seus pedidos em uma lista por rodada. Alterações de escopo exigem orçamento e aceite prévios. Silêncio não vale como aprovação.`);
-    add('p', 'A entrega compreende publicação no ambiente acordado, testes dos recursos contratados e disponibilização dos acessos administrativos aplicáveis após a quitação. O cliente mantém acesso à prévia para aprovar a entrega ' + (avista ? 'antes da publicação.' : 'antes do saldo.'));
+    add('p', avista
+      ? 'A entrega compreende publicação no ambiente acordado após aprovação expressa da versão final, testes dos recursos contratados e disponibilização dos acessos administrativos aplicáveis. O cliente terá acesso à prévia para aprovação, sem pagamento adicional de saldo na entrega.'
+      : P.loja ? 'A entrega compreende publicação no ambiente acordado após aprovação expressa da versão final, testes dos recursos contratados e disponibilização dos acessos administrativos aplicáveis. O cliente terá acesso à prévia para aprovação antes do pagamento do saldo. A publicação e a entrega dos acessos ocorrerão após a quitação.'
+      : 'A entrega compreende publicação no ambiente acordado, testes dos recursos contratados e disponibilização dos acessos administrativos aplicáveis após a quitação. O cliente mantém acesso à prévia para aprovar a entrega antes do saldo.');
 
     add('page', 'Condições gerais e assinaturas');
     add('h', '5 Responsabilidades e suporte');

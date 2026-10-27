@@ -93,20 +93,23 @@ test('contrato segue o modelo de 3 páginas com os valores e as condições de c
     assert.ok(txt.includes(`Preço total do desenvolvimento: ${norm(C.brl(P.centavos))} (${C.extenso(P.centavos)})`), P.id);
     assert.equal(pg.agora + pg.depois, P.centavos);
     if (f === 'parcelado') assert.ok(txt.includes(`Entrada: ${norm(C.brl(pg.agora))}  |  Saldo na entrega: ${norm(C.brl(pg.depois))}`));
-    else assert.ok(txt.includes(`À vista na assinatura: ${norm(C.brl(P.centavos))}`));
-    // as três páginas do modelo, nesta ordem, e o Anexo I do plano
+    else {
+      assert.ok(txt.includes(P.id === 'essencial' ? `Pagamento à vista: ${norm(C.brl(P.centavos))}  |  Saldo: R$ 0,00` : `Entrada integral: ${norm(C.brl(P.centavos))}  |  Saldo na entrega: R$ 0,00`), `${P.id}: à vista`);
+      assert.ok(txt.includes('Pagamento integral antecipado') && txt.includes('Não haverá segunda parcela') && txt.includes('confirmação do pagamento integral'));
+    }
+    // as três páginas do modelo de cada plano, nesta ordem, e o Anexo I
     const pages = b.blocks.filter(x => x.t === 'page').map(x => x.text);
     assert.deepEqual(pages.slice(1), ['Escopo e execução do projeto', 'Condições gerais e assinaturas', `Anexo I · Plano ${P.nome}`]);
-    assert.equal(pages[0], P.premium ? 'Contrato de criação de site personalizado' : 'Contrato de criação de site ou loja online');
+    assert.equal(pages[0], { essencial: 'Contrato de criação de site essencial', loja: 'Contrato de criação de loja online', premium: 'Contrato de criação de site personalizado' }[P.id]);
     assert.deepEqual(b.blocks.filter(x => /^\d /.test(x.text) && x.t === 'h').map(x => +x.text[0]), [1, 2, 3, 4, 5, 6, 7, 8]);
     // revisões, suporte e prazo acompanham o card do plano
     assert.ok(txt.includes(`até ${P.revisoes === 2 ? 'duas' : C.porExtenso(P.revisoes)} rodadas de ajustes`), `${P.id}: revisões`);
     assert.ok(txt.includes(`por ${P.suporte} dias corridos após a entrega`), `${P.id}: suporte`);
     assert.ok(txt.includes(`Até ${C.dias(P.prazo)}`));
-    // modalidade: só a do plano marcada; o Personalizado traz o nome comercial
-    const checks = b.blocks.filter(x => x.t === 'check');
-    if (P.premium) assert.ok(!checks.length && txt.includes(`comercialmente denominado ${P.nome}`));
-    else assert.ok(checks.filter(x => x.on).length === 1 && checks.find(x => x.on).text.includes(P.nome));
+    // modalidade do próprio plano; o Personalizado traz o nome comercial
+    assert.ok(!b.blocks.some(x => x.t === 'check'));
+    if (P.premium) assert.ok(txt.includes(`comercialmente denominado ${P.nome}`));
+    else assert.ok(txt.includes(`Modalidade contratada: ${P.id === 'essencial' ? 'Plano Essencial' : 'Loja Online'}.`), `${P.id}: modalidade`);
     assert.equal(txt.includes('provedor de pagamento'), !!(P.loja || P.premium));
     assert.ok(txt.includes(`CPF ${C.maskDoc(CLIENTE.doc)}`) && txt.includes(CLIENTE.nome));
     assert.ok(!/Profissional\b(?! )/.test(txt.replace('Sites de 10 Mil Profissionais', '')), 'sem o plano antigo');
@@ -213,4 +216,68 @@ test('API: recusa pedidos inválidos', async () => {
   const r = await call({ ...PEDIDO, doc: '111.111.111-11' });
   assert.equal(r.status, 400);
   assert.equal(r.body.erros.doc, 'CPF inválido.');
+});
+
+/* ---------- contrato guardado, painel /admin e via do cliente ---------- */
+function chamar(fn, { method = 'POST', body, headers = {}, url = '/' } = {}) {
+  return new Promise(resolve => {
+    const res = {
+      statusCode: 200, headers: {},
+      setHeader(k, v) { this.headers[k.toLowerCase()] = v; },
+      end(b) { resolve({ status: this.statusCode, body: b ? JSON.parse(b) : null }); }
+    };
+    fn({ method, body, headers, url }, res);
+  });
+}
+
+test('contrato assinado fica guardado; painel lista, muda status e exclui; via só abre com a chave', async () => {
+  const { mkdtemp, rm } = await import('node:fs/promises');
+  const os = await import('node:os');
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'webora-'));
+  Object.assign(process.env, { WEBORA_DADOS_LOCAL: dir, ADMIN_SENHA: 'senha-teste', WEBORA_LINK_SEGREDO: 'link-teste' });
+  try {
+    const admin = require('../api/admin.js'), via = require('../api/via.js');
+    const d = { ...CLIENTE, empresa: 'Doces da Maria', plano: 'loja', pagamento: 'parcelado', numero: 'WB-261027-K7QX', dataLonga: '27 de outubro de 2026' };
+    const b = C.build(d);
+    const assinatura = 'data:image/png;base64,iVBORw0KGgo=', assinadoEm = '27/10/2026, 15:42:10 (horário de Brasília)';
+    const hash = await C.sha256(C.toText(b.blocks) + `\nAssinado eletronicamente por ${d.nome} (${b.docTipo} ${C.maskDoc(d.doc)}) em ${assinadoEm}.\n` + assinatura);
+    const r = await chamar(handler, { body: { ...d, hash, assinatura, assinadoEm }, headers: { host: 'localhost:3000', 'user-agent': 'teste' } });
+    assert.equal(r.body.salvo, true);
+    assert.match(r.body.via, /^http:\/\/localhost:3000\/contrato\?n=WB-261027-K7QX&k=[\w-]{24}$/);
+    // texto que não bate com o código de verificação fica marcado
+    await chamar(handler, { body: { ...d, numero: 'WB-261027-K7QY', hash, assinatura, assinadoEm } });
+
+    assert.equal((await chamar(admin, { body: { acao: 'listar' }, headers: { authorization: 'Bearer errada' } })).status, 401);
+    const auth = { authorization: 'Bearer senha-teste' };
+    const lista = (await chamar(admin, { body: { acao: 'listar' }, headers: auth })).body.itens;
+    assert.equal(lista.length, 2);
+    const it = lista.find(x => x.numero === d.numero);
+    assert.equal(it.cliente.empresa, 'Doces da Maria');
+    assert.equal(it.status, 'assinado');
+    assert.equal(it.integridade, true);
+    assert.equal(lista.find(x => x.numero === 'WB-261027-K7QY').integridade, false);
+    assert.deepEqual([it.pagamento.total, it.pagamento.agora, it.pagamento.depois], [59999, 30000, 29999]);
+
+    assert.equal((await chamar(admin, { body: { acao: 'status', numero: d.numero, status: 'entrada', nota: 'Pix recebido' }, headers: auth })).status, 200);
+    assert.equal((await chamar(admin, { body: { acao: 'status', numero: d.numero, status: 'xyz' }, headers: auth })).status, 400);
+    assert.equal((await chamar(admin, { body: { acao: 'listar' }, headers: auth })).body.itens.find(x => x.numero === d.numero).status, 'entrada');
+    const ver = (await chamar(admin, { body: { acao: 'ver', numero: d.numero }, headers: auth })).body;
+    assert.equal(ver.historico[0].nota, 'Pix recebido');
+    assert.equal(ver.assinatura, assinatura);
+    assert.equal(ver.registro.origem.agente, 'teste');
+
+    const k = new URL(r.body.via).searchParams.get('k');
+    const v1 = await chamar(via, { method: 'GET', url: `/api/via?n=${d.numero}&k=${k}` });
+    assert.equal(v1.status, 200);
+    assert.equal(v1.body.registro.origem, undefined);
+    assert.equal(v1.body.blocks.length, b.blocks.length);
+    assert.equal((await chamar(via, { method: 'GET', url: `/api/via?n=${d.numero}&k=${'x'.repeat(24)}` })).status, 404);
+    assert.equal((await chamar(via, { method: 'GET', url: `/api/via?n=WB-261027-K7QY&k=${k}` })).status, 404);
+
+    await chamar(admin, { body: { acao: 'excluir', numero: d.numero }, headers: auth });
+    assert.deepEqual((await chamar(admin, { body: { acao: 'listar' }, headers: auth })).body.itens.map(x => x.numero), ['WB-261027-K7QY']);
+  } finally {
+    ['WEBORA_DADOS_LOCAL', 'ADMIN_SENHA', 'WEBORA_LINK_SEGREDO'].forEach(k => delete process.env[k]);
+    await rm(dir, { recursive: true, force: true });
+  }
 });
