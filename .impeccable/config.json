@@ -1,0 +1,80 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "admin.html"
+        ],
+        "createdAt": "2026-10-27T23:12:34.299Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "marquee",
+        "value": "*",
+        "files": [
+          "admin.html"
+        ],
+        "createdAt": "2026-10-27T23:12:35.201Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "admin.html"
+        ],
+        "createdAt": "2026-10-27T23:12:36.111Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "overused-font",
+        "value": "*",
+        "files": [
+          "admin.html"
+        ],
+        "createdAt": "2026-10-27T23:12:36.874Z",
+        "reason": "Claude: Plus Jakarta Sans é a fonte da marca Webora usada em todo o site"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "contrato.html"
+        ],
+        "createdAt": "2026-10-27T23:12:37.591Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "marquee",
+        "value": "*",
+        "files": [
+          "contrato.html"
+        ],
+        "createdAt": "2026-10-27T23:12:38.522Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "contrato.html"
+        ],
+        "createdAt": "2026-10-27T23:12:39.303Z",
+        "reason": "Claude: regra do style.css compartilhado (.perk, .marquee, .done__badge) que não aparece nesta página"
+      },
+      {
+        "rule": "overused-font",
+        "value": "*",
+        "files": [
+          "contrato.html"
+        ],
+        "createdAt": "2026-10-27T23:12:40.075Z",
+        "reason": "Claude: Plus Jakarta Sans é a fonte da marca Webora usada em todo o site"
+      }
+    ]
+  }
+}

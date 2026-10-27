@@ -281,3 +281,25 @@ test('contrato assinado fica guardado; painel lista, muda status e exclui; via s
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('painel bloqueia depois de 5 senhas erradas, mesmo com a senha certa', async () => {
+  const { mkdtemp, rm } = await import('node:fs/promises');
+  const os = await import('node:os');
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'webora-'));
+  Object.assign(process.env, { WEBORA_DADOS_LOCAL: dir, ADMIN_SENHA: 'senha-teste' });
+  try {
+    const admin = require('../api/admin.js');
+    const tentar = s => chamar(admin, { body: { acao: 'listar' }, headers: { authorization: `Bearer ${s}`, 'x-forwarded-for': '203.0.113.7' } });
+    const r1 = await tentar('errada');
+    assert.equal(r1.status, 401);
+    assert.match(r1.body.erro, /Restam 4 tentativas/);
+    for (let i = 0; i < 3; i++) await tentar('errada');
+    assert.equal((await tentar('errada')).status, 429);
+    assert.equal((await tentar('senha-teste')).status, 429);
+    // outro IP segue entrando normalmente
+    assert.equal((await chamar(admin, { body: { acao: 'listar' }, headers: { authorization: 'Bearer senha-teste', 'x-forwarded-for': '198.51.100.9' } })).status, 200);
+  } finally {
+    ['WEBORA_DADOS_LOCAL', 'ADMIN_SENHA'].forEach(k => delete process.env[k]);
+    await rm(dir, { recursive: true, force: true });
+  }
+});
