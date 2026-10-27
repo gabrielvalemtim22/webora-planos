@@ -34,12 +34,12 @@
   <script>document.documentElement.classList.replace('no-js', 'js')</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&family=Caveat:wght@500&display=swap">
   <link rel="preload" as="image" href="/assets/img/projetos/jesusnewjob.webp" fetchpriority="high">
-  <link rel="stylesheet" href="/assets/css/style.css?v=6">
-  <script src="/assets/js/config.js?v=6" defer></script>
-  <script src="/assets/js/contrato.js?v=6" defer></script>
-  <script src="/assets/js/app.js?v=6" defer></script>
+  <link rel="stylesheet" href="/assets/css/style.css?v=7">
+  <script src="/assets/js/config.js?v=7" defer></script>
+  <script src="/assets/js/contrato.js?v=7" defer></script>
+  <script src="/assets/js/app.js?v=7" defer></script>
 
   <script type="application/ld+json">
   {
@@ -122,6 +122,7 @@
       <symbol id="i-half" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor"/></symbol>
       <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12.5" rx="2.2"/><path d="M8.5 20.5h7M12 16.5v4"/></symbol>
       <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5v-8Z"/><path d="M8.5 9.5h.01M12 9.5h.01M15.5 9.5h.01"/></symbol>
+      <symbol id="i-pix" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.8 15.2 6l-3.2 3.2L8.8 6Z"/><path d="M12 14.8l3.2 3.2-3.2 3.2-3.2-3.2Z"/><path d="M2.8 12 6 8.8 9.2 12 6 15.2Z"/><path d="M14.8 12 18 8.8l3.2 3.2-3.2 3.2Z"/></symbol>
     </defs>
   </svg>
 
@@ -150,61 +151,65 @@
   </header>
 
   <main id="conteudo">
-    <!-- APRESENTAÇÃO -->
-    <section class="hero t-light" id="topo" aria-labelledby="hero-title">
-      <div class="geo geo--hero" aria-hidden="true">
-        <svg viewBox="0 0 760 760" fill="none" preserveAspectRatio="xMaxYMin meet">
-          <path class="geo__a" d="M470-30 755.8 135v330L470 630 184.2 465V135Z"/>
-          <path class="geo__b" d="M560 20 759.2 135v230L560 480 360.8 365V135Z"/>
-          <path class="geo__line" d="M430 30 689.8 180v300L430 630 170.2 480V180Z"/>
-          <path class="geo__c" d="M664 104 774 167.5v127L664 358 554 294.5v-127Z"/>
-        </svg>
-      </div>
-      <div class="container">
-        <div class="hero__inner">
-          <div class="hero__copy">
-            <p class="eyebrow eyebrow--after">Sites profissionais</p>
-            <h1 class="hero__title" id="hero-title">
-              <span class="line"><span>Sua marca</span></span>
-              <span class="line"><span>merece um site</span></span>
-              <span class="line line--hl"><span>extraordinário<span class="dot">.</span></span></span>
-            </h1>
-            <p class="hero__lead">Design que impressiona. Tecnologia que transforma visitas em clientes.</p>
-            <div class="hero__cta">
-              <a class="btn btn--primary btn--lg" href="#planos">Conhecer os planos <svg class="i i--up"><use href="#i-ext"/></svg></a>
-              <a class="tlink" href="#projetos">Explorar projetos <svg class="i"><use href="#i-arrow"/></svg></a>
-            </div>
-            <ul class="hero__trust">
-              <li><svg class="i"><use href="#i-check"/></svg><span>Entrega em <span data-stat="prazo">1 dia útil</span></span></li>
-              <li><svg class="i"><use href="#i-check"/></svg>Pix à vista ou 50% + 50%</li>
-              <li><svg class="i"><use href="#i-check"/></svg>Contrato assinado online</li>
-            </ul>
-          </div>
-
-          <div class="hero__visual" aria-hidden="true" data-tilt>
-            <div class="hero__slab layer" style="--z:.2"></div>
-            <figure class="win win--light layer" style="--z:.4">
-              <div class="win__bar"><i></i><i></i><i></i><span>conectagoogle.vercel.app</span></div>
-              <img src="/assets/img/projetos/conectagoogle.webp" alt="" width="1280" height="800" decoding="async">
-            </figure>
-            <figure class="win win--dark layer" style="--z:.75">
-              <div class="win__bar"><i></i><i></i><i></i><span>jesusnewjob.com.br</span></div>
-              <img src="/assets/img/projetos/jesusnewjob.webp" alt="" width="1280" height="800" fetchpriority="high" decoding="async">
-            </figure>
-            <figure class="device layer" style="--z:1.15"><img src="/assets/img/projetos/conectagoogle-m.webp" alt="" width="450" height="900" decoding="async"></figure>
-            <div class="tag tag--real layer" style="--z:1.6"><span class="tag__ico"><svg class="i"><use href="#i-check"/></svg></span><span><b>Projetos reais</b><small>Publicados e no ar</small></span></div>
-            <div class="tag tag--wa layer" style="--z:1.35"><span class="tag__ico tag__ico--dark"><svg class="i"><use href="#i-wa"/></svg></span><span><b>WhatsApp a um toque</b><small>Cliente direto na conversa</small></span></div>
-          </div>
+    <!-- APRESENTAÇÃO: os projetos em anel ao redor do título -->
+    <section class="hero hero--ring t-light" id="topo" aria-labelledby="hero-title">
+      <div class="orbit" aria-hidden="true">
+        <div class="orbit__ring orbit__ring--back" data-orbit="back">
+          <span class="orb" style="--i:0"><img src="/assets/img/vitrine/conecta-d4.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:1"><img src="/assets/img/vitrine/keke-d3.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:2"><img src="/assets/img/vitrine/kivora-d3.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:3"><img src="/assets/img/vitrine/jesus-d5.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:4"><img src="/assets/img/vitrine/conecta-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:5"><img src="/assets/img/vitrine/keke-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:6"><img src="/assets/img/vitrine/kivora-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:7"><img src="/assets/img/vitrine/jesus-d4.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:8"><img src="/assets/img/vitrine/conecta-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:9"><img src="/assets/img/vitrine/keke-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:10"><img src="/assets/img/vitrine/kivora-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:11"><img src="/assets/img/vitrine/jesus-d1.webp" alt="" width="520" height="325" decoding="async"></span>
         </div>
-
-        <ul class="facts">
-          <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-monitor"/></svg></span><span><b><span data-stat="projetos">4</span> projetos no ar</b><small>Sites reais publicados para você abrir e conferir.</small></span></li>
-          <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-card"/></svg></span><span><b>Pagamento único</b><small>Sem mensalidade da Webora. Seu site é seu.</small></span></li>
-          <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-globe"/></svg></span><span><b>Domínio incluso por 1 ano</b><small>Seu .com.br incluído no plano, sem custo extra.</small></span></li>
-          <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-doc"/></svg></span><span><b>Contrato digital</b><small>Tudo online, com assinatura no site e PDF.</small></span></li>
+        <div class="orbit__ring" data-orbit="front">
+          <span class="orb" style="--i:0"><img src="/assets/img/vitrine/kivora-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:1"><img src="/assets/img/vitrine/jesus-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:2"><img src="/assets/img/vitrine/keke-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:3"><img src="/assets/img/vitrine/conecta-d1.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:4"><img src="/assets/img/vitrine/kivora-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:5"><img src="/assets/img/vitrine/jesus-d4.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:6"><img src="/assets/img/vitrine/keke-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:7"><img src="/assets/img/vitrine/conecta-d2.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:8"><img src="/assets/img/vitrine/kivora-d3.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:9"><img src="/assets/img/vitrine/jesus-d5.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:10"><img src="/assets/img/vitrine/keke-d3.webp" alt="" width="520" height="325" decoding="async"></span>
+          <span class="orb" style="--i:11"><img src="/assets/img/vitrine/conecta-d4.webp" alt="" width="520" height="325" decoding="async"></span>
+        </div>
+      </div>
+      <div class="container hero__center" data-orbit-core>
+        <h1 class="hero__title" id="hero-title">
+          <span class="line"><span>Sua marca</span></span>
+          <span class="line"><span>merece um site</span></span>
+          <span class="line line--hl"><span>extraordinário<span class="dot">.</span></span></span>
+        </h1>
+        <p class="hero__lead">Design que impressiona. Tecnologia que transforma visitas em clientes.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="#planos">Conhecer os planos <svg class="i i--up"><use href="#i-ext"/></svg></a>
+          <a class="tlink" href="#projetos">Explorar projetos <svg class="i"><use href="#i-arrow"/></svg></a>
+        </div>
+        <ul class="hero__trust">
+          <li><svg class="i"><use href="#i-check"/></svg><span>Entrega em <span data-stat="prazo">1 dia útil</span></span></li>
+          <li><svg class="i"><use href="#i-check"/></svg>Pagamento único</li>
+          <li><svg class="i"><use href="#i-check"/></svg>Contrato digital</li>
         </ul>
       </div>
     </section>
+
+    <div class="container facts-wrap">
+      <ul class="facts">
+        <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-monitor"/></svg></span><span><b><span data-stat="projetos">4</span> projetos no ar</b><small>Sites reais publicados para você abrir e conferir.</small></span></li>
+        <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-card"/></svg></span><span><b>Pagamento único</b><small>Sem mensalidade da Webora. Seu site é seu.</small></span></li>
+        <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-globe"/></svg></span><span><b>Domínio incluso por 1 ano</b><small>Seu .com.br incluído no plano, sem custo extra.</small></span></li>
+        <li class="fact"><span class="fact__ico"><svg class="i"><use href="#i-doc"/></svg></span><span><b>Contrato digital</b><small>Tudo online, com assinatura no site e PDF.</small></span></li>
+      </ul>
+    </div>
 
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track">
@@ -238,50 +243,30 @@
       </div>
     </section>
 
-    <!-- PORTFÓLIO -->
-    <section class="section t-gray work-sec" id="projetos" aria-labelledby="projetos-title">
-      <div class="geo geo--side" aria-hidden="true">
-        <svg viewBox="0 0 400 520" fill="none" preserveAspectRatio="xMaxYMin meet">
-          <path class="geo__a" d="M330 40 520 150v220L330 480 140 370V150Z"/>
-          <path class="geo__line" d="M300 10 510 131v242L300 494 90 373V131Z"/>
-          <path class="geo__c" d="M400-70 486-20v100L400 130l-86-50V-20Z"/>
-        </svg>
-      </div>
+    <!-- PORTFÓLIO: um projeto por vez, no notebook e no celular -->
+    <section class="section t-light pf-sec" id="projetos" aria-labelledby="projetos-title">
       <div class="container">
-        <header class="sec-head sec-head--split">
+        <header class="pf-head">
           <div>
-            <p class="eyebrow" data-reveal>Portfólio</p>
+            <p class="eyebrow eyebrow--pill" data-reveal>Portfólio</p>
             <h2 class="title" id="projetos-title" data-reveal>Projetos que <span class="hl">falam por nós<span class="dot">.</span></span></h2>
+            <p class="lead pf-head__lead" data-reveal>Conheça o que a Webora pode criar para o seu negócio.</p>
           </div>
-          <p class="lead" data-reveal>Conheça sites reais criados pela Webora. Cada projeto está publicado: abra, navegue e teste no computador ou no celular antes de contratar.</p>
+          <p class="pf-note" aria-hidden="true">
+            <svg class="pf-note__a1" viewBox="0 0 60 40"><path d="M6 6c10 6 18 14 22 26M22 30l6 4 3-7"/></svg>
+            <span>Sites reais.<br>Resultados reais.</span>
+            <svg class="pf-note__a2" viewBox="0 0 40 70"><path d="M10 4c18 10 22 32 10 56M14 54l6 8 7-6"/></svg>
+          </p>
         </header>
-        <div class="filters" role="group" aria-label="Filtrar projetos" data-filters data-reveal>
-          <button class="filter" type="button" data-filter="todos" aria-pressed="true">Todos</button>
-          <button class="filter" type="button" data-filter="loja" aria-pressed="false">Lojas online</button>
-          <button class="filter" type="button" data-filter="institucional" aria-pressed="false">Institucionais</button>
+        <div class="pf" data-pf>
+          <div class="pf__track" data-pf-track tabindex="0" aria-roledescription="carrossel" aria-label="Projetos publicados pela Webora"></div>
+          <div class="pf__nav">
+            <button class="pf__arrow" type="button" data-pf-prev aria-label="Projeto anterior"><svg class="i"><use href="#i-back"/></svg></button>
+            <div class="pf__dots" data-pf-dots></div>
+            <button class="pf__arrow" type="button" data-pf-next aria-label="Próximo projeto"><svg class="i"><use href="#i-arrow"/></svg></button>
+          </div>
         </div>
-        <p class="sr-only" aria-live="polite" data-filter-status></p>
-        <div class="work" data-work></div>
         <noscript><p class="noscript">Ative o JavaScript para ver os projetos, ou peça os links pelo WhatsApp (11) 95930-4102.</p></noscript>
-
-        <div class="next t-dark" data-reveal>
-          <div class="next__geo" aria-hidden="true">
-            <svg viewBox="0 0 320 320" fill="none"><path class="geo__solid" d="M230 20 368 100v160L230 340 92 260V100Z"/><path class="geo__line" d="M190 0 346 90v180L190 360 34 270V90Z"/></svg>
-          </div>
-          <div class="next__copy">
-            <h3 class="next__title">O próximo projeto pode <span class="hl">ser o seu<span class="dot">.</span></span></h3>
-            <p>Vamos criar um site sob medida para o seu negócio, com design moderno, alta performance e o WhatsApp a um toque.</p>
-          </div>
-          <div class="next__actions">
-            <a class="btn btn--primary btn--lg" href="#planos">Escolher meu plano <svg class="i i--move"><use href="#i-arrow"/></svg></a>
-            <a class="btn btn--ghost btn--lg" data-wa="Olá, Webora! Quero conversar sobre um site para o meu negócio." href="https://wa.me/5511959304102" target="_blank" rel="noopener">Vamos conversar <svg class="i i--up"><use href="#i-ext"/></svg></a>
-          </div>
-          <ul class="next__list">
-            <li><span class="next__ico"><svg class="i"><use href="#i-chat"/></svg></span>Atendimento pelo WhatsApp</li>
-            <li><span class="next__ico"><svg class="i"><use href="#i-bolt"/></svg></span><span>Entrega em <span data-stat="prazo">1 dia útil</span></span></li>
-            <li><span class="next__ico"><svg class="i"><use href="#i-shield"/></svg></span>Contrato digital e Pix</li>
-          </ul>
-        </div>
       </div>
     </section>
 
@@ -336,24 +321,18 @@
     </section>
 
     <!-- COMO FUNCIONA -->
-    <section class="section t-dark how" id="como-funciona" aria-labelledby="como-title">
-      <div class="geo geo--how" aria-hidden="true">
-        <svg viewBox="0 0 1440 560" fill="none" preserveAspectRatio="xMidYMid slice">
-          <path class="geo__line" d="M1300-60 1500 55v230L1300 400 1100 285V55Z"/>
-          <path class="geo__a" d="M1340 20 1480 101v162l-140 81-140-81V101Z"/>
-          <path class="geo__line" d="M90 360 230 441v162L90 684-50 603V441Z"/>
-        </svg>
-      </div>
+    <section class="section t-light how2" id="como-funciona" aria-labelledby="como-title">
       <div class="container">
-        <header class="sec-head sec-head--center">
-          <p class="eyebrow eyebrow--before" data-reveal>Como funciona</p>
-          <h2 class="title" id="como-title" data-reveal>Do contrato ao site no ar, <span class="hl">sem enrolação</span></h2>
+        <header class="how2__head">
+          <p class="eyebrow eyebrow--pill" data-reveal>Como funciona</p>
+          <h2 class="title" id="como-title" data-reveal>Seu site no ar em <span class="hl">4 passos<span class="dot">.</span></span></h2>
+          <p class="lead" data-reveal>Do plano à publicação, tudo online e sem complicação.</p>
         </header>
-        <ol class="steps">
-          <li class="step" data-reveal><span class="step__top"><span class="step__n">01</span><span class="step__ico"><svg class="i"><use href="#i-layout"/></svg></span></span><h3>Escolha seu plano</h3><p>Essencial, Loja Online ou Sites de 10 Mil Profissionais: o plano certo para o momento do seu negócio.</p></li>
-          <li class="step" data-reveal style="--d:.08s"><span class="step__top"><span class="step__n">02</span><span class="step__ico"><svg class="i"><use href="#i-pen"/></svg></span></span><h3>Assine online</h3><p>Preencha seus dados, leia o contrato e assine com o dedo ou o mouse, em poucos minutos.</p></li>
-          <li class="step" data-reveal style="--d:.16s"><span class="step__top"><span class="step__n">03</span><span class="step__ico"><svg class="i"><use href="#i-qr"/></svg></span></span><h3>Realize o pagamento</h3><p>Pix com o valor exato, à vista ou 50% na assinatura e 50% na entrega.</p></li>
-          <li class="step" data-reveal style="--d:.24s"><span class="step__top"><span class="step__n">04</span><span class="step__ico"><svg class="i"><use href="#i-rocket"/></svg></span></span><h3>Receba seu site</h3><p>Você aprova a versão final e o seu site é publicado no seu domínio.</p></li>
+        <ol class="steps4">
+          <li data-reveal style="--d:0.00s"><a class="step4" href="#planos"><span class="step4__n">01</span><span class="step4__ico"><svg class="i"><use href="#i-layers"/></svg></span><span class="step4__txt"><b>Escolha seu plano</b><small>A solução ideal para o seu negócio.</small></span><svg class="i step4__go" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+          <li data-reveal style="--d:0.08s"><a class="step4" href="#contratar"><span class="step4__n">02</span><span class="step4__ico"><svg class="i"><use href="#i-pen"/></svg></span><span class="step4__txt"><b>Assine online</b><small>Contrato digital, simples e rápido.</small></span><svg class="i step4__go" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+          <li data-reveal style="--d:0.16s"><a class="step4" href="#contratar"><span class="step4__n">03</span><span class="step4__ico"><svg class="i"><use href="#i-pix"/></svg></span><span class="step4__txt"><b>Pague com Pix</b><small>À vista ou 50% + 50% na entrega.</small></span><svg class="i step4__go" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+          <li data-reveal style="--d:0.24s"><a class="step4" href="#duvidas"><span class="step4__n">04</span><span class="step4__ico"><svg class="i"><use href="#i-rocket"/></svg></span><span class="step4__txt"><b>Receba seu site</b><small>Aprove e publique no seu domínio.</small></span><svg class="i step4__go" aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
         </ol>
       </div>
     </section>
@@ -520,21 +499,18 @@
     </section>
 
     <!-- CHAMADA FINAL -->
-    <section class="cta t-royal" aria-labelledby="cta-title">
-      <div class="geo geo--cta" aria-hidden="true">
-        <svg viewBox="0 0 1440 520" fill="none" preserveAspectRatio="xMidYMid slice">
-          <path class="geo__w1" d="M1260-80 1490 53v266L1260 452 1030 319V53Z"/>
-          <path class="geo__w2" d="M1330 60 1450 129v138l-120 69-120-69V129Z"/>
-          <path class="geo__wl" d="M150 300 330 404v208L150 716-30 612V404Z"/>
-        </svg>
-      </div>
-      <div class="container cta__inner" data-reveal>
-        <span class="cta__mark"><img src="/assets/img/marca/webora-simbolo.webp?v=6" alt="" width="72" height="72" loading="lazy"></span>
-        <h2 class="title" id="cta-title">Seu próximo cliente está procurando você na internet<span class="dot">.</span></h2>
-        <p class="cta__lead">Planos a partir de <b data-preco-min>R$ 599,99</b>, em pagamento único e sem mensalidade da Webora.</p>
-        <div class="cta__actions">
-          <a class="btn btn--white btn--lg" href="#contratar">Contratar agora <svg class="i i--move"><use href="#i-arrow"/></svg></a>
-          <a class="btn btn--outline-white btn--lg" data-wa="Olá, Webora! Quero um site profissional." href="https://wa.me/5511959304102" target="_blank" rel="noopener"><svg class="i"><use href="#i-wa"/></svg> Falar no WhatsApp</a>
+    <section class="cta-sec t-light" aria-labelledby="cta-title">
+      <div class="container">
+        <div class="cta-band" data-reveal>
+          <div class="cta-band__copy">
+            <p class="cta-band__eyebrow">Pronto para começar?</p>
+            <h2 class="cta-band__title" id="cta-title">Vamos criar o seu próximo passo?</h2>
+            <p class="cta-band__lead">Sites profissionais para transformar o seu negócio em oportunidades reais.</p>
+          </div>
+          <div class="cta-band__actions">
+            <a class="btn btn--white btn--lg" href="#contratar">Começar agora <svg class="i i--move"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn--outline-white btn--lg" data-wa="Olá, Webora! Quero um site profissional." href="https://wa.me/5511959304102" target="_blank" rel="noopener"><svg class="i"><use href="#i-wa"/></svg> Conversar no WhatsApp</a>
+          </div>
         </div>
       </div>
     </section>

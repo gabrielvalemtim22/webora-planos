@@ -53,20 +53,106 @@
   }), { rootMargin: '-45% 0px -50% 0px' });
   $$('main > section[id]').forEach(s => spy.observe(s));
 
-  /* ---------- topo: profundidade suave dos mockups ---------- */
-  const visual = $('[data-tilt]'), hero = $('.hero');
-  if (visual && matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    let raf = 0, mx = 0, my = 0;
-    const clamp = v => Math.max(-1, Math.min(1, v));
-    hero.addEventListener('pointermove', e => {
-      if (reduce()) return;
-      const r = visual.getBoundingClientRect();
-      mx = clamp((e.clientX - (r.left + r.width / 2)) / r.width);
-      my = clamp((e.clientY - (r.top + r.height / 2)) / r.height);
-      if (!raf) raf = requestAnimationFrame(() => { raf = 0; visual.style.setProperty('--mx', mx.toFixed(3)); visual.style.setProperty('--my', my.toFixed(3)); });
-    });
-    hero.addEventListener('pointerleave', () => { visual.style.setProperty('--mx', 0); visual.style.setProperty('--my', 0); });
-  }
+  /* ---------- topo: os projetos em anel, em profundidade, ao redor do título ---------- */
+  (function orbit() {
+    const hero = $('.hero--ring');
+    if (!hero) return;
+    const box = $('.orbit', hero), core = $('[data-orbit-core]', hero);
+    const rings = $$('[data-orbit]', hero).map(el => ({ el, back: el.dataset.orbit === 'back', frames: $$('.orb', el) }));
+    let R = 500, K = .6, persp = 2300, phone = false, spin = 0, last = 0, running = false, mx = 0, my = 0, tmx = 0, tmy = 0;
+
+    // caixas do texto em relação ao centro do anel, medidas sem as transformações da entrada
+    function textBoxes() {
+      const b = box.getBoundingClientRect(), c = core.getBoundingClientRect();
+      const ox = c.left - (b.left + b.width / 2), oy = c.top - (b.top + b.height / 2);
+      return $$('.hero__title .line > span, .hero__lead, .hero__cta > *, .hero__trust li', core).map(e => {
+        let x = 0, y = 0;
+        for (let n = e; n && n !== core; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
+        return [ox + x, oy + y, ox + x + e.offsetWidth, oy + y + e.offsetHeight];
+      });
+    }
+
+    // o card percorre a elipse inteira; em nenhum ponto pode encostar no texto
+    function clears(T, fw, r, v, zA) {
+      for (let i = 0; i < 48; i++) {
+        const a = i / 48 * Math.PI * 2, c = Math.cos(a), sc = persp / (persp - c * r * zA);
+        const x = Math.sin(a) * r, hw = fw * sc / 2 + 14, hh = fw * .625 * sc / 2 + 14;
+        for (const y of [c * v * .95, c * v * 1.05]) {
+          if (T.some(t => x + hw > t[0] && x - hw < t[2] && y + hh > t[1] && y - hh < t[3])) return false;
+        }
+      }
+      return true;
+    }
+
+    function layout() {
+      const W = innerWidth, H = box.clientHeight;
+      phone = W <= 760;
+      persp = (phone ? 2.4 : 1.7) * W;
+      const zA = phone ? .45 : .85, T = textBoxes();
+      const r0 = phone ? .62 * W : Math.min(.4 * W, (H / 2 - 60) / .6), rMax = phone ? .95 * W : .62 * W;
+      // procura o anel mais justo que contorna o texto: primeiro abre para os lados, depois diminui os cards
+      let fit = null;
+      search: for (let fw = (phone ? .44 : .38) * r0; fw >= (phone ? 60 : 96); fw *= .92) {
+        for (let r = r0; r <= rMax; r *= 1.04) {
+          const vMax = H / 2 - fw * .3125 * persp / (persp - r * zA) - 6;
+          for (let v = r * (phone ? .5 : .42); v <= vMax; v += 4) {
+            if (clears(T, fw, r, v, zA)) { fit = [fw, r, v]; break search; }
+          }
+        }
+      }
+      const [fw, r, v] = fit || [phone ? 60 : 96, rMax, H / 2 - (phone ? 30 : 48)];
+      R = r; K = v / r;
+      rings.forEach(g => {
+        g.el.style.perspective = persp + 'px';
+        g.frames.forEach(f => { f.style.width = (g.back ? fw * .62 : fw) + 'px'; });
+      });
+    }
+
+    function place(p) {
+      rings.forEach(r => {
+        const step = 360 / r.frames.length;
+        const rr = R * (r.back ? 1.17 : 1) * (1 + .5 * p);
+        const k = K * (r.back ? .95 : 1) * (1 + my * .05) * (1 - .2 * p);
+        const zA = (phone ? .45 : .85) * (r.back ? .6 : 1);
+        const zoff = p * .55 * R - (r.back ? R * .5 : 0);
+        const base = (r.back ? 15 - spin * .6 : spin) + p * 80 + mx * 8;
+        r.frames.forEach((f, i) => {
+          const a = (i * step + base) * Math.PI / 180, s = Math.sin(a), c = Math.cos(a);
+          const z = c * rr * zA + zoff, back = (persp - z) / persp;
+          f.style.transform = `translate(-50%, -50%) translate3d(${(s * rr * back).toFixed(1)}px, ${(c * rr * k * back).toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${(-s * (r.back ? 14 : 24)).toFixed(1)}deg) rotateX(${(c * 10).toFixed(1)}deg)`;
+          f.style.zIndex = String(Math.round(z + 4000));
+          if (!r.back) f.style.opacity = (.72 + .28 * (c + 1) / 2).toFixed(3);
+        });
+      });
+    }
+
+    const progress = () => {
+      if (reduce()) return 0;
+      const r = hero.getBoundingClientRect();
+      return Math.max(0, Math.min(1, -r.top / r.height));
+    };
+    function tick(t) {
+      if (!running) return;
+      const dt = Math.min(64, t - (last || t)) / 1000;
+      last = t;
+      if (!reduce()) spin += 3 * dt;
+      mx += (tmx - mx) * .06; my += (tmy - my) * .06;
+      place(progress());
+      requestAnimationFrame(tick);
+    }
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      hero.addEventListener('pointermove', e => { tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; });
+      hero.addEventListener('pointerleave', () => { tmx = 0; tmy = 0; });
+    }
+    layout();
+    place(0);
+    addEventListener('resize', () => { layout(); place(progress()); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); place(progress()); });
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(tick); }
+      else if (!e.isIntersecting) running = false;
+    }).observe(hero);
+  })();
 
   const track = $('.marquee__track');
   if (track) track.append(...[...track.children].map(n => n.cloneNode(true)));
@@ -78,64 +164,82 @@
   $$('[data-stat="prazo-max"]').forEach(el => { el.textContent = C.dias(prazoMax); });
   $$('[data-prazo-extra]').forEach(el => { el.hidden = prazoMax <= prazoMin; });
 
-  /* ---------- portfólio ---------- */
+  /* ---------- portfólio: um projeto por vez, no notebook e no celular ---------- */
   // os prints mantêm as cores próprias de cada site; a moldura é a da Webora
-  const browser = p => `<figure class="browser">
-        <div class="browser__bar"><i></i><i></i><i></i><span>${icon('lock')}${esc(p.dominio)}</span></div>
-        <img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)}" width="1280" height="800" loading="lazy" decoding="async">
-      </figure>`;
-  const work = $('[data-work]');
-  work.innerHTML = PROJETOS.map((p, i) => {
-    const P = PLANOS[p.plano], feature = i === 0;
-    return `<article class="case${feature ? ' case--feature' : ''}" data-cat="${esc(p.categoria || 'institucional')}" data-reveal${feature ? '' : ` style="--d:${((i - 1) % 3) * .08}s"`}>
-      <a class="case__media" href="${esc(p.url)}" target="_blank" rel="noopener" aria-label="Abrir o site ${esc(p.nome)} em nova aba">
-        ${browser(p)}
-        ${feature && p.imagemCelular ? `<figure class="device"><img src="${esc(p.imagemCelular)}" alt="" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
-      </a>
-      <div class="case__body">
-        <div class="case__head">
-          <p class="case__tag">${esc(p.tipo)}</p>
-          <h3 class="case__name">${esc(p.nome)}</h3>
-          <p class="case__seg">${esc(p.segmento)}</p>
+  const tags = p => [p.categoria === 'loja' ? 'E-commerce' : p.tipo, 'Responsivo'];
+  const pfTrack = $('[data-pf-track]');
+  pfTrack.innerHTML = PROJETOS.map((p, i) => {
+    const P = PLANOS[p.plano];
+    return `<article class="pf__slide" aria-roledescription="slide" aria-label="${i + 1} de ${PROJETOS.length}: ${esc(p.nome)}">
+      <div class="pf__media">
+        <div class="laptop"><div class="laptop__screen"><img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)} no computador" width="1280" height="800" loading="${i ? 'lazy' : 'eager'}" decoding="async"></div><div class="laptop__base"></div></div>
+        ${p.imagemCelular ? `<figure class="device pf__phone"><img src="${esc(p.imagemCelular)}" alt="${esc(p.nome)} no celular" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
+      </div>
+      <div class="pf__body">
+        <div class="pf__info">
+          <h3 class="pf__name">${esc(p.nome)}</h3>
+          <p class="pf__type">${esc(p.tipo)} · ${esc(p.segmento)}</p>
+          <p class="pf__desc">${esc(p.descricao)}</p>
         </div>
-        <div class="case__info">
-          <p class="case__desc">${esc(p.descricao)}</p>
-          <ul class="case__feats">${p.recursos.map(r => `<li>${esc(r)}</li>`).join('')}</ul>
-        </div>
-        <div class="case__foot">
-          <a class="case__link" href="${esc(p.url)}" target="_blank" rel="noopener">Explorar projeto ${icon('ext')}<span class="sr-only"> ${esc(p.nome)} (abre em nova aba)</span></a>
-          ${P ? `<a class="case__plan" href="#contratar" data-choose="${P.id}">Plano indicado: <b>${esc(P.nome)}</b></a>` : ''}
+        <ul class="pf__tags">${tags(p).map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+        <div class="pf__actions">
+          <a class="btn btn--primary btn--lg" href="${esc(p.url)}" target="_blank" rel="noopener">Ver projeto ${icon('ext', 'i i--up')}<span class="sr-only"> ${esc(p.nome)} (abre em nova aba)</span></a>
+          ${P ? `<a class="btn btn--ghost-blue btn--lg" href="#contratar" data-choose="${P.id}">Quero um assim</a>` : ''}
         </div>
       </div>
     </article>`;
   }).join('');
 
-  // abaixo do destaque, cards em linhas de 3 quando em 2 colunas sobraria um sozinho
-  function layoutWork() {
-    const comuns = $$('.case:not(.case--feature):not([hidden])', work).length;
-    work.classList.toggle('work--3', comuns % 2 === 1 && comuns % 3 === 0);
-    work.classList.toggle('work--1', comuns === 1);
+  const slides = $$('.pf__slide', pfTrack);
+  const dotsBox = $('[data-pf-dots]'), pfPrev = $('[data-pf-prev]'), pfNext = $('[data-pf-next]');
+  dotsBox.innerHTML = slides.map((s, i) => `<button class="pf__dot" type="button" aria-label="Ver o projeto ${i + 1}: ${esc(PROJETOS[i].nome)}"></button>`).join('');
+  const dots = $$('.pf__dot', dotsBox);
+  // o deslize é animado aqui: o smooth nativo, num carrossel com snap, para no meio quando muda de direção.
+  // enquanto anda, as setas contam a partir do destino, não do meio do caminho
+  let target = -1, anim = 0;
+  const current = () => target >= 0 ? target : slides.reduce((best, s, i) => Math.abs(s.offsetLeft - pfTrack.scrollLeft) < Math.abs(slides[best].offsetLeft - pfTrack.scrollLeft) ? i : best, 0);
+  const stop = () => {
+    if (target < 0) return;
+    cancelAnimationFrame(anim);
+    target = -1;
+    pfTrack.style.scrollSnapType = '';
+    pfUpdate();
+  };
+  const goTo = i => {
+    cancelAnimationFrame(anim);
+    target = Math.max(0, Math.min(slides.length - 1, i));
+    const from = pfTrack.scrollLeft, to = slides[target].offsetLeft, t0 = performance.now();
+    pfUpdate();
+    if (reduce() || from === to) { pfTrack.scrollLeft = to; stop(); return; }
+    pfTrack.style.scrollSnapType = 'none';
+    const step = now => {
+      const k = Math.min(1, (now - t0) / 560);
+      pfTrack.scrollLeft = from + (to - from) * (1 - (1 - k) ** 3);
+      if (k < 1) anim = requestAnimationFrame(step); else stop();
+    };
+    anim = requestAnimationFrame(step);
+  };
+  // quem arrasta ou rola o carrossel assume o controle
+  ['pointerdown', 'wheel', 'touchstart'].forEach(t => pfTrack.addEventListener(t, stop, { passive: true }));
+  function pfUpdate() {
+    const c = current();
+    dots.forEach((d, i) => { if (i === c) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+    slides.forEach((s, i) => { s.inert = i !== c; });
+    pfPrev.disabled = c === 0;
+    pfNext.disabled = c === slides.length - 1;
   }
-  layoutWork();
-
-  const filtros = $$('[data-filter]'), filtroStatus = $('[data-filter-status]');
-  const temCategoria = cat => cat === 'todos' || PROJETOS.some(p => (p.categoria || 'institucional') === cat);
-  filtros.forEach(b => { if (!temCategoria(b.dataset.filter)) b.hidden = true; });
-  filtros.forEach(b => b.addEventListener('click', () => {
-    const cat = b.dataset.filter;
-    filtros.forEach(f => f.setAttribute('aria-pressed', String(f === b)));
-    let n = 0;
-    $$('.case', work).forEach(c => {
-      const ok = cat === 'todos' || c.dataset.cat === cat, was = !c.hidden;
-      c.hidden = !ok;
-      if (!ok) return;
-      n++;
-      c.classList.add('in');
-      if (!was && !reduce()) c.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.22, 1, .36, 1)' });
-    });
-    layoutWork();
-    filtroStatus.textContent = `${n} ${n === 1 ? 'projeto exibido' : 'projetos exibidos'}`;
-  }));
+  let pfRaf = 0;
+  pfTrack.addEventListener('scroll', () => { if (!pfRaf) pfRaf = requestAnimationFrame(() => { pfRaf = 0; pfUpdate(); }); }, { passive: true });
+  pfPrev.addEventListener('click', () => goTo(current() - 1));
+  pfNext.addEventListener('click', () => goTo(current() + 1));
+  dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+  pfTrack.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    goTo(current() + (e.key === 'ArrowRight' ? 1 : -1));
+  });
+  addEventListener('resize', () => { pfTrack.scrollLeft = slides[current()].offsetLeft; pfUpdate(); });
+  pfUpdate();
 
   /* ---------- planos ---------- */
   const VISIVEIS = 6;   // no celular, os demais itens ficam em "Ver todos os recursos"

@@ -85,23 +85,36 @@ test('validação de CPF, CNPJ e dados obrigatórios', () => {
   assert.equal(C.limpar({ email: 'A@B.COM' }).email, 'a@b.com');
 });
 
-test('contrato usa os valores e as cláusulas certas de cada plano', () => {
+test('contrato segue o modelo de 3 páginas com os valores e as condições de cada plano', () => {
   for (const P of LISTA) for (const f of C.PAGAMENTOS) {
     const b = C.build({ ...CLIENTE, plano: P.id, pagamento: f, numero: 'WB-261020-AB12', dataLonga: '20 de outubro de 2026' });
     const txt = norm(C.toText(b.blocks));
-    assert.ok(txt.includes(`valor total de ${norm(C.brl(P.centavos))} (${C.extenso(P.centavos)})`), P.id);
-    assert.ok(txt.includes(`ANEXO I: PLANO ${P.nome.toUpperCase()}`));
-    assert.ok(txt.includes(`Rodadas de revisão: ${P.revisoes}`));
-    if (f === 'parcelado') assert.ok(txt.includes(`entrada de ${norm(C.brl(b.pagamento.agora))}`) && txt.includes(`saldo de ${norm(C.brl(b.pagamento.depois))}`));
-    // numeração da cláusula 2 sem saltos
-    const c2 = b.blocks.filter(x => /^2\.\d+\./.test(x.text)).map(x => +x.text.match(/^2\.(\d+)/)[1]);
-    assert.deepEqual(c2, c2.map((_, i) => i + 1));
-    assert.equal(txt.includes('nome comercial do plano'), !!P.premium);
+    const pg = b.pagamento;
+    assert.ok(txt.includes(`Preço total do desenvolvimento: ${norm(C.brl(P.centavos))} (${C.extenso(P.centavos)})`), P.id);
+    assert.equal(pg.agora + pg.depois, P.centavos);
+    if (f === 'parcelado') assert.ok(txt.includes(`Entrada: ${norm(C.brl(pg.agora))}  |  Saldo na entrega: ${norm(C.brl(pg.depois))}`));
+    else assert.ok(txt.includes(`À vista na assinatura: ${norm(C.brl(P.centavos))}`));
+    // as três páginas do modelo, nesta ordem, e o Anexo I do plano
+    const pages = b.blocks.filter(x => x.t === 'page').map(x => x.text);
+    assert.deepEqual(pages.slice(1), ['Escopo e execução do projeto', 'Condições gerais e assinaturas', `Anexo I · Plano ${P.nome}`]);
+    assert.equal(pages[0], P.premium ? 'Contrato de criação de site personalizado' : 'Contrato de criação de site ou loja online');
+    assert.deepEqual(b.blocks.filter(x => /^\d /.test(x.text) && x.t === 'h').map(x => +x.text[0]), [1, 2, 3, 4, 5, 6, 7, 8]);
+    // revisões, suporte e prazo acompanham o card do plano
+    assert.ok(txt.includes(`até ${P.revisoes === 2 ? 'duas' : C.porExtenso(P.revisoes)} rodadas de ajustes`), `${P.id}: revisões`);
+    assert.ok(txt.includes(`por ${P.suporte} dias corridos após a entrega`), `${P.id}: suporte`);
+    assert.ok(txt.includes(`Até ${C.dias(P.prazo)}`));
+    // modalidade: só a do plano marcada; o Personalizado traz o nome comercial
+    const checks = b.blocks.filter(x => x.t === 'check');
+    if (P.premium) assert.ok(!checks.length && txt.includes(`comercialmente denominado ${P.nome}`));
+    else assert.ok(checks.filter(x => x.on).length === 1 && checks.find(x => x.on).text.includes(P.nome));
     assert.equal(txt.includes('provedor de pagamento'), !!(P.loja || P.premium));
+    assert.ok(txt.includes(`CPF ${C.maskDoc(CLIENTE.doc)}`) && txt.includes(CLIENTE.nome));
     assert.ok(!/Profissional\b(?! )/.test(txt.replace('Sites de 10 Mil Profissionais', '')), 'sem o plano antigo');
   }
-  const premium = norm(C.toText(C.build({ ...CLIENTE, plano: 'premium', pagamento: 'avista', numero: 'WB-261020-AB12', dataLonga: 'x' }).blocks));
-  assert.ok(premium.includes('aprovação do briefing previsto na cláusula 2.4'));
+  const premium = norm(C.toText(C.build({ ...CLIENTE, plano: 'premium', pagamento: 'parcelado', numero: 'WB-261020-AB12', dataLonga: 'x' }).blocks));
+  assert.ok(premium.includes('Entrada: R$ 500,00  |  Saldo na entrega: R$ 499,99'));
+  assert.ok(premium.includes('arredondamento de um centavo na entrada'));
+  assert.ok(premium.includes('aprovação do briefing'));
   assert.ok(premium.includes('até 12 (doze) páginas'));
 });
 

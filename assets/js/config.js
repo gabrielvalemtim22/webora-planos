@@ -33,7 +33,7 @@
       cidade: 'SAO PAULO'                // até 15 letras, sem acento
     },
     foro: 'São Paulo/SP',
-    versaoContrato: '4.0'
+    versaoContrato: '5.0'
   };
 
   /* Planos, na ordem em que aparecem no site (o do meio é o destaque).
@@ -43,6 +43,7 @@
      chaves              → três recursos com ícone no topo do card (ícones do index.html: #i-<icone>)
      destaques           → itens do card (lista com check)
      entregas/naoInclui  → Anexo I do contrato
+     paginas / cadastro  → campo de páginas e de produtos com cadastro inicial do contrato
      prazo / prazoMax    → dias úteis de entrega / teto em alta demanda ou problemas técnicos
      destaque: true      → card azul e opção já marcada na contratação
      loja: true          → o contrato pede a lista de produtos
@@ -91,6 +92,7 @@
         'Produção de fotos e textos'
       ],
       paginas: '1 (uma) página com até 6 (seis) seções',
+      cadastro: 'sem cadastro de produtos',
       revisoes: 2,
       prazo: 1,
       prazoMax: 3,
@@ -148,6 +150,7 @@
         'Produção de fotos profissionais dos produtos'
       ],
       paginas: 'loja com até 8 (oito) páginas-modelo, mais a página de cada produto cadastrado',
+      cadastro: 'cadastro inicial de até 30 (trinta) produtos',
       revisoes: 3,
       prazo: 1,
       prazoMax: 3,
@@ -208,6 +211,7 @@
         'Produção de fotos e vídeos profissionais'
       ],
       paginas: 'até 12 (doze) páginas, com o mapa de páginas definido no briefing',
+      cadastro: 'cadastro inicial de até 30 (trinta) produtos quando o projeto incluir loja',
       revisoes: 4,
       prazo: 1,
       prazoMax: 3,
