@@ -643,7 +643,7 @@
     const x = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
     const badge = $('.done__badge', wiz).getBoundingClientRect();
     const ox = badge.left + badge.width / 2, oy = badge.top + badge.height / 2;
-    const cores = ['#0754FA', '#0754FA', '#FFFFFF', '#5C8DFF', '#080808'];
+    const cores = ['#FFD400', '#FFD400', '#FFFFFF', '#FFEC80', '#080808'];
     const parts = Array.from({ length: 120 }, () => ({ x: ox, y: oy, vx: (Math.random() - .5) * 15, vy: Math.random() * -13 - 3, s: Math.random() * 7 + 3, r: Math.random() * 6, c: cores[Math.floor(Math.random() * cores.length)] }));
     const t0 = performance.now();
     (function tick(t) {

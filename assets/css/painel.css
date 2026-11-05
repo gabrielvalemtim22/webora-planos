@@ -93,6 +93,11 @@
 .ok-tag { color: #1E6B3A; font-weight: 700; }
 .warn-tag { color: #8A5A00; font-weight: 700; }
 
+/* Marca amarela, textos de ação legíveis sobre as telas claras. */
+.btn--light:hover { color: var(--black); border-color: var(--blue); }
+.kv a { color: var(--black); text-decoration-color: var(--blue); }
+.pg__brand img { display: block; }
+
 @media (max-width: 900px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .tools { grid-template-columns: 1fr 1fr; }

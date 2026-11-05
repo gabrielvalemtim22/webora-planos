@@ -151,7 +151,7 @@ test('textos estáticos do index.html acompanham config.js', async () => {
   assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
 });
 
-test('identidade azul royal: sem o verde-neon, preços antigos ou urgência falsa', async () => {
+test('identidade amarela, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
   const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
   for (const f of files) {
     const s = await read(f);
@@ -162,11 +162,15 @@ test('identidade azul royal: sem o verde-neon, preços antigos ou urgência fals
     assert.ok(!/últimas horas|vai esgotar|nunca mais/i.test(s), `urgência falsa em ${f}`);
     assert.ok(!/webora-planos\.vercel\.app/.test(s), `domínio antigo em ${f}`);
   }
-  assert.match(await read('assets/css/style.css'), /--blue: #0754FA;/);
+  assert.match(await read('assets/css/style.css'), /--blue: #FFD400;/);
+  const html = await read('index.html');
+  assert.match(html, /webora-2026-icon\.jpg/);
+  assert.match(html, /webora-2026-wordmark\.png/);
+  assert.match(html, /vitrine\/kivora-2026\.png/);
   const img = await readdir(path.join(ROOT, 'assets/img'));
   assert.ok(!img.includes('webora-mark.webp') && !img.includes('favicon-48.png'), 'logo/ícones antigos removidos');
   const marca = await readdir(path.join(ROOT, 'assets/img/marca'));
-  assert.deepEqual(marca.sort(), ['webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-simbolo.webp']);
+  assert.deepEqual(marca.sort(), ['webora-2026-icon.jpg', 'webora-2026-wordmark.png', 'webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-simbolo.webp']);
 });
 
 /* ---------- api/contrato.js ---------- */
