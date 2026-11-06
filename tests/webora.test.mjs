@@ -166,7 +166,11 @@ test('identidade amarela, preta e branca: sem o verde-neon, preços antigos ou u
   const html = await read('index.html');
   assert.match(html, /webora-2026-icon\.jpg/);
   assert.match(html, /webora-2026-wordmark\.png/);
-  assert.match(html, /vitrine\/kivora-2026\.png/);
+  // abertura em filme 3D: vídeo do computador, do celular e o primeiro quadro
+  assert.match(html, /data-src="\/assets\/3d\/webora-3d\.mp4/);
+  assert.match(html, /data-src-mobile="\/assets\/3d\/webora-3d-m\.mp4/);
+  assert.match(html, /assets\/3d\/cine-poster\.webp/);
+  assert.match(html, /media-src 'self' blob:/);
   const img = await readdir(path.join(ROOT, 'assets/img'));
   assert.ok(!img.includes('webora-mark.webp') && !img.includes('favicon-48.png'), 'logo/ícones antigos removidos');
   const marca = await readdir(path.join(ROOT, 'assets/img/marca'));
