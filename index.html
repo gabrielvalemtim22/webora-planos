@@ -37,11 +37,13 @@
   <link rel="preload" as="image" href="/assets/3d/cine-poster.webp?v=1" fetchpriority="high">
   <link rel="stylesheet" href="/assets/css/style.css?v=9">
   <link rel="stylesheet" href="/assets/css/cinema.css?v=1">
+  <link rel="stylesheet" href="/assets/css/polish.css?v=1">
   <script src="/assets/js/config.js?v=8" defer></script>
   <script src="/assets/js/contrato.js?v=8" defer></script>
   <script src="/assets/js/documento.js?v=8" defer></script>
-  <script src="/assets/js/app.js?v=8" defer></script>
+  <script src="/assets/js/app.js?v=9" defer></script>
   <script src="/assets/js/cinema.js?v=1" defer></script>
+  <script src="/assets/js/polish.js?v=1" defer></script>
 
   <script type="application/ld+json">
   {
@@ -140,6 +142,7 @@
         <img class="brand__word" src="/assets/img/marca/webora-2026-wordmark.png?v=9" alt="" width="154" height="41">
       </a>
       <nav class="nav" id="menu" aria-label="Principal">
+        <span class="nav__pill" aria-hidden="true"></span>
         <a href="#projetos">Portfólio</a>
         <a href="#planos">Planos</a>
         <a href="#comparar">Comparar</a>
@@ -316,6 +319,7 @@
     <!-- PLANOS -->
     <section class="section t-dark plans-sec" id="planos" aria-labelledby="planos-title">
       <div class="amb amb--c" aria-hidden="true"></div>
+      <div class="amb amb--plans" aria-hidden="true"></div>
       <div class="geo geo--plans" aria-hidden="true">
         <svg viewBox="0 0 520 520" fill="none" preserveAspectRatio="xMaxYMin meet">
           <path class="geo__a" d="M380-40 600 87v254L380 468 160 341V87Z"/>
@@ -348,7 +352,7 @@
     </section>
 
     <!-- COMPARAR -->
-    <section class="section t-gray" id="comparar" aria-labelledby="comparar-title">
+    <section class="section t-dark compare-sec" id="comparar" aria-labelledby="comparar-title">
       <div class="container">
         <header class="sec-head sec-head--center">
           <p class="eyebrow eyebrow--before" data-reveal>Comparar</p>
@@ -383,7 +387,7 @@
     </section>
 
     <!-- CONTRATAÇÃO DIGITAL -->
-    <section class="section t-light contract" id="contratar" aria-labelledby="contratar-title">
+    <section class="section t-dark contract" id="contratar" aria-labelledby="contratar-title">
       <div class="geo geo--contract" aria-hidden="true">
         <svg viewBox="0 0 400 520" fill="none" preserveAspectRatio="xMinYMax meet">
           <path class="geo__a" d="M70 140 260 250v220L70 580-120 470V250Z"/>
@@ -534,7 +538,7 @@
     </section>
 
     <!-- DÚVIDAS -->
-    <section class="section t-gray" id="duvidas" aria-labelledby="duvidas-title">
+    <section class="section t-dark faq-sec" id="duvidas" aria-labelledby="duvidas-title">
       <div class="container faq">
         <header class="sec-head faq__head">
           <p class="eyebrow" data-reveal>Dúvidas</p>

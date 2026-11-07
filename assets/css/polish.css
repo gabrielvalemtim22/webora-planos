@@ -1,0 +1,278 @@
+/* =========================================================
+   Webora — acabamento de agência (2026-11)
+   Site inteiro no preto com vidro fosco, navegação em pílula,
+   planos redesenhados e seções claras convertidas para o escuro.
+   Carregado depois de style.css e cinema.css, só no index.html.
+   Não altera a abertura 3D, os objetos 3D, preços, contrato nem Pix.
+   ========================================================= */
+:root {
+  --ink: #0A0A0B;
+  --glass-bg: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .016));
+  --glass-bd: rgba(255, 255, 255, .09);
+  --glass-hi: inset 0 1px 0 rgba(255, 255, 255, .06);
+  --txt-2: #B9BEC8;
+  --txt-3: #8C929E;
+  --sun: #FFD400;
+}
+/* superfícies neutras (sem o azulado antigo) */
+.t-dark { --surface: #111113; --surface-2: #161618; --muted: var(--txt-3); --soft: #D9DCE2; }
+body { background: var(--night); }
+
+/* ---------- botões: brilho que atravessa ---------- */
+.btn--primary, .btn--light, .btn--glass { overflow: hidden; }
+.btn--primary::after, .btn--light::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .55) 48%, transparent 66%);
+  transform: translateX(-110%); transition: transform .9s var(--ease);
+}
+.btn--primary:hover::after, .btn--light:hover::after { transform: translateX(110%); }
+.btn--light { background: #fff; color: #0A0A0A; box-shadow: 0 18px 44px -20px rgba(255, 255, 255, .4); }
+.btn--light:hover { background: #FFF6CC; color: #0A0A0A; transform: translateY(-2px); }
+.btn--glass { box-shadow: var(--glass-hi); }
+
+/* ---------- cabeçalho: vidro fosco e navegação em pílula ---------- */
+.header, .header.is-open { background: rgba(8, 8, 8, .62); border-bottom: 1px solid rgba(255, 255, 255, .06); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .header { background: rgba(8, 8, 8, .5); -webkit-backdrop-filter: saturate(1.4) blur(20px); backdrop-filter: saturate(1.4) blur(20px); }
+  .header.is-scrolled { background: rgba(8, 8, 8, .74); }
+}
+.header.is-scrolled { border-color: rgba(255, 255, 255, .08); box-shadow: 0 18px 40px -30px rgba(0, 0, 0, .9); }
+.header__cta { border-radius: 999px; }
+.nav__pill { display: none; }
+@media (min-width: 1001px) {
+  .nav { position: relative; gap: 2px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); box-shadow: var(--glass-hi); }
+  .nav a:not(.btn) { z-index: 1; padding: 8px 16px; border-radius: 999px; color: #C9CCD3; font-size: 14.5px; font-weight: 600; transition: color .35s var(--ease); }
+  .nav a:not(.btn)::after { content: none; }
+  .nav a:not(.btn):hover, .nav a[aria-current='true'] { color: #fff; }
+  .nav a.is-on, .nav a.is-on:hover { color: #0A0A0A; }
+  .nav__pill {
+    display: block; position: absolute; z-index: 0; left: 0; top: 5px; bottom: 5px; width: var(--w, 0);
+    border-radius: 999px; background: var(--sun); opacity: 0; transform: translateX(var(--x, 0));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 8px 22px -8px rgba(255, 212, 0, .7);
+    transition: transform .55s var(--ease), width .55s var(--ease), opacity .3s;
+  }
+  .nav__pill.is-instant { transition: opacity .3s; }
+  .nav.has-pill .nav__pill { opacity: 1; }
+}
+
+/* ---------- títulos: selo único em todas as seções ---------- */
+.t-dark .eyebrow {
+  gap: 10px; padding: 7px 14px 7px 12px; border-radius: 999px;
+  background: rgba(255, 212, 0, .07); border: 1px solid rgba(255, 212, 0, .22);
+  color: var(--sun); font-size: 12px; font-weight: 800; letter-spacing: .18em;
+}
+.t-dark .eyebrow::before, .t-dark .eyebrow--pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--sun); box-shadow: 0 0 10px rgba(255, 212, 0, .9); }
+.t-dark .lead { color: var(--txt-2); }
+/* linha de luz entre seções escuras */
+main > .section.t-dark::before {
+  content: ''; position: absolute; z-index: -1; top: 0; left: 50%; translate: -50% 0;
+  width: min(1100px, 86%); height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .12), transparent);
+}
+main > #vantagens.section::before { content: none; }
+
+/* ---------- fatos e faixa ---------- */
+.t-dark .fact { background: var(--glass-bg); box-shadow: var(--glass-hi); }
+.t-dark .fact small { color: var(--txt-3); }
+.marquee { position: relative; padding-block: 16px; box-shadow: 0 0 60px -10px rgba(255, 212, 0, .35); }
+.marquee span { font-size: clamp(14px, 1.3vw, 16.5px); font-weight: 800; }
+
+/* ---------- benefícios e passos ---------- */
+.t-dark .perk, .t-dark .step4 { background: var(--glass-bg); box-shadow: var(--glass-hi); }
+.t-dark .perk p { color: var(--txt-2); }
+.t-dark .step4__txt small { color: var(--txt-3); }
+
+/* =========================================================
+   PLANOS
+   ========================================================= */
+.plans-sec .sec-head .title { max-width: 15ch; }
+.plans-sec .geo { opacity: .28; }
+.amb--plans { left: 50%; top: 62%; width: 60vw; aspect-ratio: 1.4; translate: -50% 0; background: radial-gradient(closest-side, rgba(255, 212, 0, .09), rgba(255, 212, 0, 0)); }
+
+/* condições numa pílula só */
+.t-dark .offer { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 2px; margin-top: 28px; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .04); border: 1px solid var(--glass-bd); box-shadow: var(--glass-hi); }
+.t-dark .offer li { padding: 7px 14px; border: 0; border-radius: 999px; background: transparent; color: #D9DCE2; font-size: 13.5px; font-weight: 700; }
+.t-dark .offer li .i { color: var(--sun); }
+.t-dark .offer .offer__main { background: var(--sun); color: #0A0A0A; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 8px 22px -10px rgba(255, 212, 0, .8); }
+.t-dark .offer .offer__main .i { color: #0A0A0A; }
+
+.t-dark .plans { margin-top: 104px; column-gap: 22px; }
+
+/* cartão base: vidro escuro */
+.plans-sec .plan {
+  padding: 30px 28px 28px; border-radius: 28px; color: #fff;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .018) 38%, rgba(255, 255, 255, .012));
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi), 0 50px 90px -56px rgba(0, 0, 0, .95);
+  transition: transform .7s var(--ease), box-shadow .7s var(--ease), border-color .4s;
+}
+.plans-sec .plan:hover { border-color: rgba(255, 255, 255, .16); box-shadow: var(--glass-hi), 0 60px 100px -50px rgba(0, 0, 0, .95); }
+/* luz que segue o mouse */
+.plans-sec .plan::after {
+  content: ''; position: absolute; inset: 0; left: 0; right: 0; top: 0; height: auto; z-index: 0;
+  border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .5s;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0), rgba(255, 255, 255, .07), transparent 45%);
+}
+.plans-sec .plan:hover::after { opacity: 1; }
+.plans-sec .plan > :not(.plan__3d) { position: relative; z-index: 1; }
+
+/* destaque: Loja Online, borda e luz solar */
+.plans-sec .plan--top {
+  border-color: transparent;
+  background: radial-gradient(110% 42% at 50% 0%, rgba(255, 212, 0, .2), rgba(255, 212, 0, 0) 70%), linear-gradient(180deg, #17150B, #0D0D0D 58%);
+  box-shadow: 0 0 0 1px rgba(255, 212, 0, .06), 0 50px 110px -60px rgba(255, 212, 0, .32);
+}
+.plans-sec .plan--top:hover { box-shadow: 0 0 0 1px rgba(255, 212, 0, .1), 0 60px 120px -56px rgba(255, 212, 0, .42); }
+.plans-sec .plan--premium { border-color: transparent; background: radial-gradient(100% 40% at 50% 0%, rgba(255, 255, 255, .08), rgba(255, 255, 255, 0) 70%), linear-gradient(180deg, #131315, #0B0B0C 60%); }
+.plans-sec .plan--top::before, .plans-sec .plan--premium::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; padding: 1px; border-radius: inherit; pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.plans-sec .plan--top::before { background: linear-gradient(180deg, rgba(255, 212, 0, .95), rgba(255, 212, 0, .28) 40%, rgba(255, 212, 0, .1)); }
+.plans-sec .plan--premium::before { background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 212, 0, .22) 32%, rgba(255, 255, 255, .06) 70%); }
+
+/* topo: selo do plano */
+.plans-sec .plan .plan__n { display: none; }
+.plans-sec .plan .plan__top { justify-content: flex-start; min-height: 26px; }
+.plans-sec .plan .plan__badge { gap: 6px; padding: 5px 11px; border-radius: 999px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); color: #CFD2D8; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+.plans-sec .plan--top .plan__badge { background: var(--sun); border-color: var(--sun); color: #0A0A0A; box-shadow: 0 8px 22px -10px rgba(255, 212, 0, .9); }
+.plans-sec .plan--premium .plan__badge { background: rgba(255, 212, 0, .08); border-color: rgba(255, 212, 0, .35); color: var(--sun); }
+.plans-sec .plan .plan__badge .i { font-size: 13px; }
+
+.plans-sec .plan .plan__name { margin-top: 16px; color: #fff; font-size: clamp(26px, 2.3vw, 31px); letter-spacing: -.04em; }
+.plans-sec .plan .plan__desc { margin-top: 10px; color: var(--txt-3); font-size: 14.5px; line-height: 1.55; }
+
+/* recursos-chave: etiquetas discretas */
+.plans-sec .plan .plan__keys { align-content: start; gap: 6px; margin-top: 18px; }
+.plans-sec .plan .plan__keys li { gap: 7px; padding: 6px 11px 6px 9px; border-radius: 999px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); color: #DADDE3; font-size: 12.5px; font-weight: 700; }
+.plans-sec .plan .plan__keys .i { color: var(--sun); font-size: 14px; }
+.plans-sec .plan--top .plan__keys li { background: rgba(255, 212, 0, .07); border-color: rgba(255, 212, 0, .2); }
+
+/* preço: a peça principal */
+.plans-sec .plan .plan__pricebox { margin-top: 22px; padding: 22px 0 0; border: 0; border-top: 1px solid rgba(255, 255, 255, .08); border-radius: 0; background: none; }
+.plans-sec .plan--top .plan__pricebox { border-top-color: rgba(255, 212, 0, .18); }
+.plans-sec .plan .plan__offer { gap: 6px; margin-bottom: 10px; padding: 0; background: none; color: var(--sun); font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+.plans-sec .plan .plan__offer .i { font-size: 12px; }
+.plans-sec .plan .plan__price { gap: 6px; }
+.plans-sec .plan .plan__price .cur { align-self: flex-start; margin-top: .45em; color: var(--txt-3); font-size: 17px; font-weight: 700; }
+.plans-sec .plan .plan__price b { color: #fff; font-size: clamp(48px, 4.4vw, 60px); letter-spacing: -.055em; }
+.plans-sec .plan--top .plan__price b { color: var(--sun); text-shadow: 0 0 40px rgba(255, 212, 0, .28); }
+.plans-sec .plan .plan__terms { margin-top: 10px; color: var(--txt-3); font-size: 13px; }
+.plans-sec .plan .plan__terms + .plan__terms { margin-top: 2px; }
+.plans-sec .plan .plan__terms b { color: #E9EBEF; }
+.plans-sec .plan .plan__call { margin-top: 14px; padding: 9px 12px; border-radius: 12px; background: rgba(255, 212, 0, .08); border: 1px solid rgba(255, 212, 0, .24); color: #FFE680; font-size: 13.5px; font-weight: 700; }
+.plans-sec .plan .plan__call .i { color: var(--sun); font-size: 15px; }
+
+.plans-sec .plan > .btn { margin-top: 22px; border-radius: 16px; }
+.plans-sec .plan--top > .btn--sun { background: var(--sun); color: #0A0A0A; }
+.plans-sec .plan--top > .btn--sun:hover { background: #FFE04D; color: #0A0A0A; }
+
+/* entrega, revisões e suporte lado a lado, fáceis de comparar */
+.plans-sec .plan .plan__meta { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 14px; padding: 12px 0; border: 1px solid rgba(255, 255, 255, .07); border-radius: 16px; background: rgba(255, 255, 255, .025); }
+.plans-sec .plan .plan__meta li { display: block; min-width: 0; padding: 0 6px; text-align: center; }
+.plans-sec .plan .plan__meta li + li { border-left: 1px solid rgba(255, 255, 255, .08); }
+.plans-sec .plan .plan__meta small { color: var(--txt-3); font-size: 10.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.plans-sec .plan .plan__meta b { margin-top: 2px; color: #fff; font-size: 14.5px; white-space: nowrap; }
+.plans-sec .plan--top .plan__meta { background: rgba(255, 212, 0, .06); border-color: rgba(255, 212, 0, .18); }
+.plans-sec .plan--top .plan__meta li + li { border-color: rgba(255, 212, 0, .16); }
+
+/* lista de recursos */
+.plans-sec .plan .plan__features { margin-top: 24px; padding-top: 0; border: 0; }
+.plans-sec .plan .plan__lead { margin-bottom: 14px; color: #fff; font-size: 13.5px; font-weight: 800; }
+.plans-sec .plan .plan__list { gap: 10px; }
+.plans-sec .plan .plan__list li { gap: 11px; color: #C6CAD2; font-size: 14.5px; line-height: 1.45; }
+.plans-sec .plan .plan__list .i { width: 18px; height: 18px; margin-top: 2px; padding: 3.5px; background: rgba(255, 212, 0, .13); color: var(--sun); }
+.plans-sec .plan--top .plan__list .i { background: var(--sun); color: #0A0A0A; }
+.plans-sec .plan .plan__more { color: #fff; text-decoration-color: var(--sun); }
+.plans-sec .plan .plan__note { color: var(--txt-3); font-size: 12.5px; }
+.plans-sec .plan .plan__ideal { margin-top: 22px; padding-top: 16px; border-top: 1px dashed rgba(255, 255, 255, .12); color: var(--txt-3); font-size: 13.5px; }
+.plans-sec .plan .plan__ideal b { color: #fff; }
+.plans-sec .plan :focus-visible { outline-color: #fff; }
+
+.plans-sec .plan__3d { top: -96px; }
+.t-dark .plans__note { max-width: 760px; margin-inline: auto; color: var(--txt-3); }
+
+/* =========================================================
+   COMPARAR no escuro
+   ========================================================= */
+.compare-sec .compare { background: rgba(255, 255, 255, .022); border-color: var(--glass-bd); box-shadow: var(--glass-hi), 0 60px 110px -70px rgba(0, 0, 0, 1); }
+.compare-sec .compare th, .compare-sec .compare td { border-bottom-color: rgba(255, 255, 255, .06); }
+.compare-sec .compare thead th { background: #111113; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.compare-sec .compare thead th:first-child { color: var(--txt-3); }
+.compare-sec .compare thead th small { color: var(--sun); }
+.compare-sec .compare thead th.is-top { background: linear-gradient(180deg, #2A2406, #17150B); color: #fff; box-shadow: inset 0 2px 0 var(--sun); }
+.compare-sec .compare thead th.is-top small { color: var(--sun); }
+.compare-sec .compare thead th.is-top em { background: var(--sun); color: #0A0A0A; }
+.compare-sec .compare .grp th { background: rgba(255, 255, 255, .03); color: var(--txt-3); }
+.compare-sec .compare tbody th[scope='row'] { color: #C6CAD2; }
+.compare-sec .compare td { color: #fff; }
+.compare-sec .compare td.is-top { background: rgba(255, 212, 0, .05); }
+.compare-sec .compare tbody tr:not(.grp):hover { background: rgba(255, 255, 255, .025); }
+.compare-sec .compare .no { background: rgba(255, 255, 255, .06); color: #6E7480; }
+.compare-sec .compare__note { color: var(--txt-3); }
+@media (max-width: 760px) {
+  .compare-sec .compare tbody th[scope='row'] { color: #fff; }
+}
+
+/* =========================================================
+   CONTRATAÇÃO no escuro (só na tela; a impressão continua igual)
+   ========================================================= */
+@media screen {
+  .contract .geo { opacity: .25; }
+  .contract .wizard {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .015));
+    border: 1px solid var(--glass-bd); box-shadow: var(--glass-hi), 0 70px 130px -70px rgba(0, 0, 0, 1);
+  }
+  .contract .field input, .contract .field textarea, .contract .copy input, .contract .check input { background: #0D0D0F; }
+  .contract .wizard__n { background: #0D0D0F; }
+  .contract .wizard__bar { background: rgba(255, 255, 255, .1); }
+  .contract__foot { color: var(--txt-3); }
+}
+
+/* =========================================================
+   DÚVIDAS no escuro
+   ========================================================= */
+.faq-sec .faq__list details { background: var(--glass-bg); border-color: var(--glass-bd); box-shadow: var(--glass-hi); }
+.faq-sec .faq__list details:hover { border-color: rgba(255, 255, 255, .16); }
+.faq-sec .faq__list details[open] { border-color: rgba(255, 212, 0, .35); box-shadow: var(--glass-hi), 0 30px 60px -40px rgba(255, 212, 0, .35); }
+.faq-sec .faq__list summary { color: #fff; }
+.faq-sec .faq__ico { background: rgba(255, 212, 0, .08); border: 1px solid rgba(255, 212, 0, .22); color: var(--sun); }
+.faq-sec .faq__list summary:hover .faq__ico { background: rgba(255, 212, 0, .16); }
+.faq-sec .faq__list details[open] summary .faq__ico { background: var(--sun); border-color: var(--sun); color: #0A0A0A; }
+.faq-sec .faq__list details > div { color: var(--txt-2); }
+.faq-sec .faq__list details b { color: #fff; }
+.faq-sec .faq__head .lead .link { color: #fff; text-decoration-color: var(--sun); }
+
+/* ---------- rodapé ---------- */
+.footer { position: relative; border-top: 1px solid rgba(255, 255, 255, .06); }
+.footer__nav a { color: #C9CCD3; }
+.wa-float { color: #0A0A0A; }
+
+/* ---------- celular ---------- */
+@media (max-width: 1000px) {
+  .t-dark .plans { margin-top: 100px; }
+}
+@media (max-width: 720px) {
+  .plans-sec .plan { padding: 26px 20px 22px; border-radius: 24px; }
+  .plans-sec .plan .plan__meta b { font-size: 13.5px; }
+  .t-dark .offer { border-radius: 22px; }
+  .t-dark .offer li { padding: 6px 11px; font-size: 12.5px; }
+}
+@media (max-width: 380px) {
+  .plans-sec .plan .plan__meta small { font-size: 9.5px; letter-spacing: .08em; }
+  .plans-sec .plan .plan__meta b { font-size: 12.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn--primary::after, .btn--light::after { display: none; }
+  .nav__pill { transition: none; }
+}
+
+/* ---------- ajustes finos ---------- */
+.plans-sec.t-dark .geo { opacity: .4; }
+.plans-sec .geo__c, .contract .geo { display: none; }
+.faq-sec .faq__ico { border-radius: 50%; }
+/* uma coluna: sem a grade alinhada (o espaço entre cartões esticava os blocos) */
+@media (max-width: 1000px) {
+  .plans-sec .plan { display: flex; flex-direction: column; grid-row: auto; }
+}

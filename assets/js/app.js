@@ -248,10 +248,12 @@
   $('[data-plans]').innerHTML = LISTA.map((P, i) => {
     const top = P.id === TOP, extra = Math.max(0, P.destaques.length - VISIVEIS);
     const chamada = P.chamada ? P.chamada.replace('{preco}', C.brl(P.centavos)) : '';
+    const btn = P.destaque ? 'btn--sun' : P.premium ? 'btn--light' : 'btn--glass';
     return `<article class="plan plan--${P.id}${top ? ' plan--top' : ''}" data-reveal style="--d:${i * .08}s" aria-labelledby="plano-${P.id}">
-      <div class="plan__top"><span class="plan__n" aria-hidden="true">${numero(i)}</span><span class="plan__badge">${P.premium ? icon('spark') : ''}${esc(P.selo)}</span></div>
+      <div class="plan__top"><span class="plan__n" aria-hidden="true">${numero(i)}</span><span class="plan__badge">${P.premium || top ? icon('spark') : ''}${esc(P.selo)}</span></div>
       <h3 class="plan__name" id="plano-${P.id}">${esc(P.nome)}</h3>
       <p class="plan__desc">${esc(P.descricao)}</p>
+      <ul class="plan__keys">${(P.chaves || []).map(k => `<li>${icon(k.icone)}<span>${esc(k.texto)}</span></li>`).join('')}</ul>
       <div class="plan__pricebox">
         ${P.oferta ? `<p class="plan__offer">${icon('spark')}${esc(P.oferta)}</p>` : ''}
         <p class="plan__price"><span class="sr-only">${C.brl(P.centavos)}</span><span class="cur" aria-hidden="true">R$</span><b aria-hidden="true">${valor(P.centavos)}</b></p>
@@ -259,19 +261,18 @@
         <p class="plan__terms">Pix à vista ou 50% + 50%</p>
         ${chamada ? `<p class="plan__call">${icon('spark')}<span>${esc(chamada)}</span></p>` : ''}
       </div>
-      <ul class="plan__keys">${(P.chaves || []).map(k => `<li>${icon(k.icone)}<span>${esc(k.texto)}</span></li>`).join('')}</ul>
-      <a class="btn ${P.destaque ? 'btn--white' : 'btn--primary'} btn--lg btn--block" href="#contratar" data-choose="${P.id}">${esc(P.botao)} ${icon('arrow', 'i i--move')}</a>
+      <a class="btn ${btn} btn--lg btn--block" href="#contratar" data-choose="${P.id}">${esc(P.botao)} ${icon('arrow', 'i i--move')}</a>
+      <ul class="plan__meta">
+        <li><small>Entrega</small><b>${C.dias(P.prazo)}</b></li>
+        <li><small>Revisões</small><b>${P.revisoes} rodadas</b></li>
+        <li><small>Suporte</small><b>${P.suporte} dias</b></li>
+      </ul>
       <div class="plan__features">
         ${P.lista ? `<p class="plan__lead">${esc(P.lista)}</p>` : ''}
         <ul class="plan__list" id="lista-${P.id}">${P.destaques.map((d, j) => `<li${j >= VISIVEIS ? ' class="is-extra"' : ''}>${icon('check')}<span>${esc(d)}</span></li>`).join('')}</ul>
         ${extra ? `<button class="plan__more" type="button" aria-expanded="false" aria-controls="lista-${P.id}" data-more="${extra}">Ver todos os recursos (+${extra})</button>` : ''}
         ${P.nota ? `<p class="plan__note">${esc(P.nota)}</p>` : ''}
       </div>
-      <ul class="plan__meta">
-        <li>${icon('truck')}<span><small>Entrega</small><b>${C.dias(P.prazo)}</b></span></li>
-        <li>${icon('refresh')}<span><small>Revisões</small><b>${P.revisoes} rodadas</b></span></li>
-        <li>${icon('headset')}<span><small>Suporte</small><b>${P.suporte} dias</b></span></li>
-      </ul>
       <p class="plan__ideal"><b>Ideal para:</b> ${esc(P.ideal)}.</p>
     </article>`;
   }).join('');
