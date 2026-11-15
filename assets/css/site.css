@@ -95,8 +95,7 @@ svg { width: 1.1em; height: 1.1em; flex: none; }
   border-radius: 999px; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.35);
   font-weight: 700; font-size: 14px; letter-spacing: .01em;
 }
-.pill__dot { width: 9px; height: 9px; border-radius: 50%; background: #39FF8F; box-shadow: 0 0 0 0 rgba(57,255,143,.7); animation: ping 2s infinite; }
-@keyframes ping { 70% { box-shadow: 0 0 0 10px rgba(57,255,143,0); } 100% { box-shadow: 0 0 0 0 rgba(57,255,143,0); } }
+.pill__dot { width: 9px; height: 9px; border-radius: 50%; background: #39FF8F; box-shadow: 0 0 0 3px rgba(57,255,143,.25); }
 .hero__title { font-size: clamp(46px, 6.6vw, 92px); margin: 22px 0 22px; letter-spacing: -0.02em; }
 .hl { position: relative; display: inline-block; color: var(--ink); z-index: 0; padding: 0 .12em; }
 .hl::before {
@@ -209,7 +208,7 @@ svg { width: 1.1em; height: 1.1em; flex: none; }
 .case__shot .win { position: relative; border-radius: 12px; box-shadow: 4px 4px 0 var(--ink); transition: transform .5s var(--ease); }
 .case__shot .win__bar { padding: 6px 8px; border-width: 2.5px; }
 .case__shot .win__bar i { width: 7px; height: 7px; border-width: 1.5px; }
-.case__shot .win__bar span { font-size: 10px; padding: 4px 8px; }
+.case__shot .win__bar span { font-size: 11px; padding: 4px 8px; }
 .case__mini { position: absolute; right: 12px; bottom: 12px; width: 27%; border-radius: 18px; padding: 4px; box-shadow: 3px 3px 0 var(--ink); transform: rotate(5deg); transition: transform .5s var(--spring); }
 .case__mini img { border-radius: 14px; }
 .cases .case:hover .case__shot .win { transform: scale(1.03) rotate(-1deg); }
