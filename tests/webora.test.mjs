@@ -148,6 +148,10 @@ test('vitrine exibe os projetos, os valores oficiais e o contato de cada plano',
     assert.ok(html.includes('src="' + project.imagem + '"'), project.nome);
     assert.ok(html.includes('src="' + project.imagemCelular + '"'), project.nome);
   }
+  const panels = [...html.matchAll(/<article\b[^>]*\bdata-project-panel[^>]*>/g)].map(([tag]) => tag);
+  assert.equal(panels.length, PROJETOS.length + 2);
+  assert.equal(panels.filter(tag => !/\shidden(?:\s|>)/.test(tag)).length, 1);
+  assert.equal([...html.matchAll(/role="tab"[^>]*aria-selected="true"/g)].length, 1);
   assert.doesNotMatch(html, /<form\b|href="#contratar"/);
   const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const organization = ld['@graph'].find(item => item['@type'] === 'Organization');
