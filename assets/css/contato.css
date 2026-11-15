@@ -51,7 +51,7 @@ a:focus-visible { outline: 3px solid var(--royal); outline-offset: 5px; }
   font-weight: 650;
   transition: background-color .2s, border-color .2s;
 }
-.masthead__link span { color: var(--royal-deep); font-size: 18px; line-height: 1; }
+.masthead__link .external-arrow { width: 16px; height: 16px; color: var(--royal-deep); }
 .masthead__link:hover { border-color: #C4CEFF; background: #F4F6FF; }
 
 .opening { padding-top: clamp(42px, 4.2vw, 68px); }
@@ -67,7 +67,8 @@ a:focus-visible { outline: 3px solid var(--royal); outline-offset: 5px; }
   font-size: clamp(55px, 6.9vw, 104px);
   font-weight: 790;
   line-height: .95;
-  letter-spacing: -.073em;
+  letter-spacing: -.061em;
+  word-spacing: .045em;
   text-wrap: balance;
 }
 .opening h1 span { display: block; color: var(--royal); }
@@ -100,7 +101,7 @@ a:focus-visible { outline: 3px solid var(--royal); outline-offset: 5px; }
 }
 .contact-button:hover { background: var(--royal-deep); box-shadow: 0 16px 27px -11px #243be895; transform: translateY(-2px); }
 .contact-button:active { transform: translateY(0); }
-.contact-button svg { width: 25px; height: 25px; flex: none; }
+.contact-button > svg { width: 25px; height: 25px; flex: none; }
 .contact-button__arrow {
   display: grid;
   place-items: center;
@@ -109,9 +110,8 @@ a:focus-visible { outline: 3px solid var(--royal); outline-offset: 5px; }
   flex: none;
   border-radius: 8px;
   background: #ffffff23;
-  font-size: 19px;
-  line-height: 1;
 }
+.contact-button__arrow .external-arrow { width: 17px; height: 17px; }
 
 .opening__art {
   position: relative;
@@ -144,7 +144,7 @@ a:focus-visible { outline: 3px solid var(--royal); outline-offset: 5px; }
   .brand__wordmark { width: 88px; }
   .masthead__link { padding-inline: 11px; gap: 7px; font-size: 13px; }
   .opening { padding-top: 46px; }
-  .opening h1 { font-size: clamp(37px, 11vw, 65px); letter-spacing: -.068em; }
+  .opening h1 { font-size: clamp(37px, 11vw, 65px); letter-spacing: -.06em; }
   .opening p { max-width: 31ch; margin-top: 19px; }
   .contact-button { margin-top: 24px; }
   .opening__art { aspect-ratio: 1.28; }
