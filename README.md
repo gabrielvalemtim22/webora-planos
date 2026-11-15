@@ -1,8 +1,8 @@
 # Webora
 
-A página inicial reúne um carrossel de destaques com pausa, os menus de serviços, projetos e planos, uma vitrine horizontal e os preços com links de orçamento pelo WhatsApp. Os destaques do portfólio usam as capturas para computador e celular em molduras 3D.
+A página inicial apresenta os serviços da Webora, as vantagens, uma vitrine de projetos filtrável e os planos com links de orçamento pelo WhatsApp. O portfólio usa capturas para computador e celular em molduras 3D.
 
-Identidade em branco, preto e azul royal (#233DEA), com a fonte Roboto.
+Identidade em branco e azul royal (#233DEA), com a fonte Source Sans 3.
 
 ## Como alterar preços, itens, prazos e projetos
 
@@ -31,7 +31,7 @@ Os valores são calculados em centavos. Quando o total tem centavo ímpar, a ent
 index.html                 página inicial com vitrine, preços e links de contato
 404.html                   página de erro
 assets/css/vitrine.css     estilos da página inicial e da vitrine 3D
-assets/js/vitrine.js       carrossel, menu, vitrine horizontal e movimento dos dispositivos
+assets/js/vitrine.js       menu móvel, abas de vantagens, filtros e movimento dos dispositivos
 assets/css/style.css       estilos compartilhados das demais páginas
 assets/js/config.js        dados da Webora, dos planos e dos projetos (edite aqui)
 assets/js/contrato.js      contrato, valores, validação, Pix e PDF (navegador e servidor)

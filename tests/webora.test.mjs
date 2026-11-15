@@ -144,13 +144,17 @@ test('vitrine exibe os projetos, os valores oficiais e o contato de cada plano',
   }
   for (const project of PROJETOS) {
     assert.ok(hrefs.includes(project.url), project.nome);
-    assert.ok(html.includes('aria-controls="projeto-' + project.id + '"'), project.nome);
-    assert.ok(html.includes('src="' + project.imagem + '"'), project.nome);
-    assert.ok(html.includes('src="' + project.imagemCelular + '"'), project.nome);
+    const card = html.split('id="projeto-' + project.id + '"')[1]?.split('</article>')[0];
+    assert.ok(card, project.nome);
+    assert.ok(card.includes('data-category="' + project.categoria + '"'), project.nome);
+    assert.ok(card.includes('src="' + project.imagem + '"'), project.nome);
+    assert.ok(card.includes('src="' + project.imagemCelular + '"'), project.nome);
+    assert.ok(card.includes('href="' + project.url + '"'), project.nome);
   }
-  const panels = [...html.matchAll(/<article\b[^>]*\bdata-project-panel[^>]*>/g)].map(([tag]) => tag);
-  assert.equal(panels.length, PROJETOS.length + 2);
-  assert.equal(panels.filter(tag => !/\shidden(?:\s|>)/.test(tag)).length, 1);
+  const cards = [...html.matchAll(/<article\b[^>]*\bdata-project\s[^>]*>/g)].map(([tag]) => tag);
+  assert.equal(cards.length, PROJETOS.length);
+  assert.ok(cards.every(tag => !/\shidden(?:\s|>)/.test(tag)));
+  assert.deepEqual([...html.matchAll(/data-filter="([^"]+)"/g)].map(([, filter]) => filter), ['todos', 'institucional', 'loja']);
   assert.equal([...html.matchAll(/role="tab"[^>]*aria-selected="true"/g)].length, 1);
   assert.doesNotMatch(html, /<form\b|href="#contratar"/);
   const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
@@ -171,8 +175,8 @@ test('vitrine exibe os projetos, os valores oficiais e o contato de cada plano',
     const offer = service.hasOfferCatalog.itemListElement.find(item => item.name === plan.nome);
     assert.equal(offer.price, C.reais(plan.centavos), plan.id);
   }
-  for (const [, src] of html.matchAll(/(?:src|srcset)="(\/assets\/img\/webora-estudio[^"]+)"/g)) {
-    await assert.doesNotReject(readFile(path.join(ROOT, src)), src);
+  for (const [, src] of html.matchAll(/(?:src|srcset)="(\/assets\/img\/[^"]+)"/g)) {
+    await assert.doesNotReject(readFile(path.join(ROOT, src.split('?')[0])), src);
   }
 });
 
@@ -194,8 +198,9 @@ test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos o
   const html = await read('index.html');
   assert.match(html, /webora-simbolo\.webp/);
   assert.match(html, /webora-logotipo-preto\.webp/);
-  assert.match(html, /webora-estudio\.webp/);
-  assert.match(html, /webora-estudio-celular\.webp/);
+  assert.match(html, /webora-site-profissional\.webp/);
+  assert.match(html, /webora-site-profissional-mobile\.webp/);
+  assert.match(html, /webora-preco-justo\.webp/);
   const manifest = JSON.parse(await read('site.webmanifest'));
   assert.ok(manifest.icons.some(icon => icon.purpose === 'maskable'));
   for (const icon of manifest.icons) await assert.doesNotReject(readFile(path.join(ROOT, icon.src.split('?')[0])));
