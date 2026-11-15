@@ -125,10 +125,25 @@
     </section>
 
     <section class="frame showcase" id="projetos" aria-labelledby="projetos-titulo">
-      <header class="showcase__heading">
-        <h2 id="projetos-titulo">Projetos em 3D</h2>
-        <p>Explore no computador e no celular</p>
-      </header>
+      <div class="showcase__toolbar">
+        <header class="showcase__heading">
+          <h2 id="projetos-titulo">Projetos em 3D</h2>
+        </header>
+        <div class="switcher" role="tablist" aria-label="Selecionar um projeto" data-project-tabs hidden>
+        <button class="switcher__tab" type="button" id="tab-jesusnewjob" role="tab" aria-controls="projeto-jesusnewjob" aria-selected="true" tabindex="0">
+          <span>Jesus New Job</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
+        </button>
+        <button class="switcher__tab" type="button" id="tab-kivora" role="tab" aria-controls="projeto-kivora" aria-selected="false" tabindex="-1">
+          <span>Kivora</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
+        </button>
+        <button class="switcher__tab" type="button" id="tab-conectagoogle" role="tab" aria-controls="projeto-conectagoogle" aria-selected="false" tabindex="-1">
+          <span>Conecta Google</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
+        </button>
+        <button class="switcher__tab" type="button" id="tab-oficinakeke" role="tab" aria-controls="projeto-oficinakeke" aria-selected="false" tabindex="-1">
+          <span>Oficina Mecânica Keke</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
+        </button>
+        </div>
+      </div>
       <div class="showcase__stage">
       <article class="project" id="projeto-jesusnewjob" data-project-panel role="tabpanel" aria-labelledby="tab-jesusnewjob">
         <div class="project__content">
@@ -210,20 +225,6 @@
           </div>
         </div>
       </article>
-      </div>
-      <div class="switcher" role="tablist" aria-label="Selecionar um projeto" data-project-tabs hidden>
-      <button class="switcher__tab" type="button" id="tab-jesusnewjob" role="tab" aria-controls="projeto-jesusnewjob" aria-selected="true" tabindex="0">
-        <span>Jesus New Job</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
-      </button>
-      <button class="switcher__tab" type="button" id="tab-kivora" role="tab" aria-controls="projeto-kivora" aria-selected="false" tabindex="-1">
-        <span>Kivora</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
-      </button>
-      <button class="switcher__tab" type="button" id="tab-conectagoogle" role="tab" aria-controls="projeto-conectagoogle" aria-selected="false" tabindex="-1">
-        <span>Conecta Google</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
-      </button>
-      <button class="switcher__tab" type="button" id="tab-oficinakeke" role="tab" aria-controls="projeto-oficinakeke" aria-selected="false" tabindex="-1">
-        <span>Oficina Mecânica Keke</span><svg class="icon" aria-hidden="true"><use href="#icon-direction"/></svg>
-      </button>
       </div>
       <noscript><ul class="project-fallback"><li><a href="https://www.jesusnewjob.com.br/">Jesus New Job</a></li><li><a href="https://www.kivorashop.com.br/">Kivora</a></li><li><a href="https://conectagoogle.vercel.app/">Conecta Google</a></li><li><a href="https://oficina-keke.vercel.app/">Oficina Mecânica Keke</a></li></ul></noscript>
     </section>
