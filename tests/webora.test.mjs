@@ -23,15 +23,13 @@ test('preços oficiais em centavos', () => {
   assert.deepEqual(LISTA.map(P => P.nome), ['Essencial', 'Loja Online', 'Sites de 10 Mil Profissionais']);
   LISTA.forEach(P => assert.ok(Number.isInteger(P.centavos) && P.centavos > 0, P.id));
   assert.equal(LISTA.filter(P => P.destaque).length, 1);
-  assert.equal(LISTA[1].destaque, true, 'Loja Online fica no centro e em destaque');
+  assert.equal(LISTA[1].destaque, true, 'Loja Online marcada como destaque');
 });
 
-test('ofertas: selo, três recursos com ícone e chamada do premium com o preço certo', async () => {
-  const html = await read('index.html');
+test('ofertas: selo, três recursos com ícone e chamada do premium com o preço certo', () => {
   for (const P of LISTA) {
     assert.equal(P.oferta, 'Oferta especial', P.id);
     assert.equal(P.chaves.length, 3, P.id);
-    P.chaves.forEach(k => assert.ok(html.includes(`<symbol id="i-${k.icone}"`), `${P.id}: ícone ${k.icone}`));
   }
   assert.equal(norm(PLANOS.premium.chamada.replace('{preco}', C.brl(PLANOS.premium.centavos))), 'Seu projeto de alto padrão por R$ 999,99.');
 });
@@ -129,30 +127,33 @@ test('tabela comparativa e projetos batem com os planos', () => {
   assert.equal(ids.size, PROJETOS.length);
 });
 
-test('prints dos projetos e do topo existem', async () => {
-  const html = await read('index.html');
-  const usados = [...PROJETOS.flatMap(p => [p.imagem, p.imagemCelular]), ...[...html.matchAll(/src="(\/assets\/img\/projetos\/[^"]+)"/g)].map(m => m[1])];
-  for (const src of usados) await assert.doesNotReject(readFile(path.join(ROOT, src.split('?')[0])), src);
-  assert.ok(html.includes(`<span data-stat="projetos">${PROJETOS.length}</span>`), 'número de projetos no topo');
+test('prints dos projetos cadastrados existem', async () => {
+  for (const src of PROJETOS.flatMap(p => [p.imagem, p.imagemCelular])) {
+    await assert.doesNotReject(readFile(path.join(ROOT, src.split('?')[0])), src);
+  }
 });
 
-test('textos estáticos do index.html acompanham config.js', async () => {
+test('página inicial direciona as conversas ao WhatsApp da Webora', async () => {
   const html = await read('index.html');
-  const desc = html.match(/<meta name="description" content="([^"]+)"/)[1];
-  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
-  const ofertas = ld['@graph'].find(n => n['@type'] === 'Service').hasOfferCatalog.itemListElement;
-  for (const P of LISTA) {
-    assert.ok(desc.includes(`${P.nome} (${norm(C.brl(P.centavos))})`), `descrição: ${P.nome}`);
-    assert.ok(html.includes(`<li>${P.nome}: ${norm(C.brl(P.centavos))}</li>`), `noscript: ${P.nome}`);
-    const o = ofertas.find(x => x.name === P.nome);
-    assert.equal(o && o.price, C.reais(P.centavos), `JSON-LD: ${P.nome}`);
+  const links = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(([, href]) => new URL(href));
+  assert.ok(links.length > 0);
+  for (const url of links) {
+    assert.equal(url.origin, 'https://wa.me');
+    assert.equal(url.pathname, '/' + WEBORA.whatsapp);
+    assert.match(url.searchParams.get('text'), /Webora/);
   }
-  assert.ok(html.includes(`data-preco="premium">${norm(C.brl(PLANOS.premium.centavos))}<`));
+  assert.match(html, /Chamar no WhatsApp/);
+  assert.doesNotMatch(html, /<form\b|<script\b[^>]*\bsrc=|id="(?:planos|contratar)"/);
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  assert.equal(ld.contactPoint.telephone.replace(/\D/g, ''), WEBORA.whatsapp);
   assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
+  for (const [, src] of html.matchAll(/(?:src|srcset)="(\/assets\/img\/webora-estudio[^"]+)"/g)) {
+    await assert.doesNotReject(readFile(path.join(ROOT, src)), src);
+  }
 });
 
 test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
-  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
+  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/css/contato.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
   for (const f of files) {
     const s = await read(f);
     assert.ok(!/#(9BFF00|B5FF45|86E000|EDFFD1|C8FF66)\b/i.test(s), `verde-neon em ${f}`);
@@ -168,9 +169,8 @@ test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos o
   const html = await read('index.html');
   assert.match(html, /webora-simbolo\.webp/);
   assert.match(html, /webora-logotipo-preto\.webp/);
-  assert.match(html, /webora-royal-lockup\.webp/);
-  assert.match(html, /class="hero-art__browser"/);
-  assert.match(html, /class="device hero-art__phone"/);
+  assert.match(html, /webora-estudio\.webp/);
+  assert.match(html, /webora-estudio-celular\.webp/);
   const manifest = JSON.parse(await read('site.webmanifest'));
   assert.ok(manifest.icons.some(icon => icon.purpose === 'maskable'));
   for (const icon of manifest.icons) await assert.doesNotReject(readFile(path.join(ROOT, icon.src.split('?')[0])));
