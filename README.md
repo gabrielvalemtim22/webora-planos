@@ -1,8 +1,8 @@
 # Webora
 
-A página inicial da Webora apresenta os serviços de criação de sites e encaminha as conversas para o WhatsApp comercial. O número aparece no cabeçalho e no botão da abertura via links para o WhatsApp e no rodapé em formato local. Os links e os dados estruturados em index.html acompanham o número de WEBORA no arquivo de configuração.
+A página inicial apresenta os projetos da Webora em molduras 3D, com capturas de computador e celular, e mostra os planos com links de orçamento pelo WhatsApp.
 
-Identidade em branco, preto e azul royal (#233DEA), com Geist na página de contato.
+Identidade em branco, preto e azul royal (#233DEA), com a fonte Geist.
 
 ## Como alterar preços, itens, prazos e projetos
 
@@ -11,9 +11,9 @@ Tudo fica em **`assets/js/config.js`** (dados usados pelo contrato, pelo PDF, pe
 - `WEBORA`: dados da empresa (MEI, CNPJ, endereço, WhatsApp e chave Pix)
 - `PLANOS`: nome, preço **em centavos** (`centavos: 59999` = R$ 599,99), selo da oferta, chamada, os três recursos com ícone do topo do card (`chaves`), itens do card, entregas do contrato, prazo, revisões e suporte
 - `COMPARATIVO`: linhas da tabela de comparação, em grupos (revisões, prazo e suporte saem de `PLANOS`)
-- `PROJETOS`: portfólio. O primeiro da lista aparece em destaque; `categoria` (`loja` ou `institucional`) alimenta o filtro Todos / Lojas online / Institucionais
+- `PROJETOS`: portfólio. os projetos e suas capturas são exibidos na vitrine
 
-Rode npm test depois de ajustar preços, condições ou dados de contato.
+Atualize os cards, links e dados estruturados em index.html junto com as alterações de preço, contato ou portfólio. Rode npm test para conferir a consistência com os dados cadastrados.
 
 ### 50% + 50%
 
@@ -28,9 +28,10 @@ Os valores são calculados em centavos. Quando o total tem centavo ímpar, a ent
 ## Estrutura
 
 ```
-index.html                 página inicial e botão para WhatsApp
+index.html                 página inicial com vitrine, preços e links de contato
 404.html                   página de erro
-assets/css/contato.css     layout da página inicial
+assets/css/vitrine.css     estilos da página inicial e da vitrine 3D
+assets/js/vitrine.js       seleção dos projetos e movimento dos dispositivos
 assets/css/style.css       estilos compartilhados das demais páginas
 assets/js/config.js        dados da Webora, dos planos e dos projetos (edite aqui)
 assets/js/contrato.js      contrato, valores, validação, Pix e PDF (navegador e servidor)
@@ -64,7 +65,7 @@ npm run marca   # regenera logotipo, favicons e assets/img/og.jpg a partir de ma
 ## SEO e publicação
 
 - Domínio canônico: `https://www.weborasites.com.br/` (o endereço sem `www` redireciona para ele). O endereço `webora-planos.vercel.app` redireciona para o domínio.
-- `sitemap.xml`, `robots.txt`, Open Graph, Twitter/X Cards e dados estruturados de contato da Webora.
+- `sitemap.xml`, `robots.txt`, Open Graph, Twitter/X Cards e dados estruturados de contato e planos da Webora.
 - As imagens ficam 7 dias em cache no navegador (`vercel.json`). Ao trocar uma imagem, salve com outro nome ou aumente o número de versão (`?v=6`) no endereço.
 
 Publicação: cada `git push` na branch `main` atualiza o site na Vercel.

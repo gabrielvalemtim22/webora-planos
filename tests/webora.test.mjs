@@ -133,27 +133,47 @@ test('prints dos projetos cadastrados existem', async () => {
   }
 });
 
-test('página inicial direciona as conversas ao WhatsApp da Webora', async () => {
+test('vitrine exibe os projetos, os valores oficiais e o contato de cada plano', async () => {
   const html = await read('index.html');
-  const links = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(([, href]) => new URL(href));
-  assert.ok(links.length > 0);
-  for (const url of links) {
-    assert.equal(url.origin, 'https://wa.me');
+  const hrefs = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(([, href]) => href);
+  const contacts = hrefs.filter(href => href.startsWith('https://wa.me/')).map(href => new URL(href));
+  assert.ok(contacts.length >= LISTA.length);
+  for (const url of contacts) {
     assert.equal(url.pathname, '/' + WEBORA.whatsapp);
     assert.match(url.searchParams.get('text'), /Webora/);
   }
-  assert.match(html, /Chamar no WhatsApp/);
-  assert.doesNotMatch(html, /<form\b|<script\b[^>]*\bsrc=|id="(?:planos|contratar)"/);
+  for (const project of PROJETOS) {
+    assert.ok(hrefs.includes(project.url), project.nome);
+    assert.ok(html.includes('aria-controls="projeto-' + project.id + '"'), project.nome);
+    assert.ok(html.includes('src="' + project.imagem + '"'), project.nome);
+    assert.ok(html.includes('src="' + project.imagemCelular + '"'), project.nome);
+  }
+  assert.doesNotMatch(html, /<form\b|href="#contratar"/);
   const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
-  assert.equal(ld.contactPoint.telephone.replace(/\D/g, ''), WEBORA.whatsapp);
+  const organization = ld['@graph'].find(item => item['@type'] === 'Organization');
+  const service = ld['@graph'].find(item => item['@type'] === 'Service');
+  assert.equal(organization.contactPoint.telephone.replace(/\D/g, ''), WEBORA.whatsapp);
   assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
+  for (const plan of LISTA) {
+    const article = html.split('data-plan="' + plan.id + '"')[1]?.split('</article>')[0];
+    assert.ok(article, plan.id);
+    assert.ok(article.includes('<h3>' + plan.nome + '</h3>'), plan.id);
+    assert.ok(article.includes('<strong>' + norm(C.brl(plan.centavos)).replace('R$ ', '') + '</strong>'), plan.id);
+    const link = new URL(article.match(/data-plan-contact="[^"]+"\s+href="([^"]+)"/)[1]);
+    assert.equal(link.origin, 'https://wa.me');
+    assert.equal(link.pathname, '/' + WEBORA.whatsapp);
+    const message = link.searchParams.get('text');
+    assert.ok(message.includes(plan.nome) && message.includes(norm(C.brl(plan.centavos))), plan.id);
+    const offer = service.hasOfferCatalog.itemListElement.find(item => item.name === plan.nome);
+    assert.equal(offer.price, C.reais(plan.centavos), plan.id);
+  }
   for (const [, src] of html.matchAll(/(?:src|srcset)="(\/assets\/img\/webora-estudio[^"]+)"/g)) {
     await assert.doesNotReject(readFile(path.join(ROOT, src)), src);
   }
 });
 
 test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
-  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/css/contato.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
+  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/css/vitrine.css', 'assets/js/vitrine.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
   for (const f of files) {
     const s = await read(f);
     assert.ok(!/#(9BFF00|B5FF45|86E000|EDFFD1|C8FF66)\b/i.test(s), `verde-neon em ${f}`);
@@ -165,6 +185,7 @@ test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos o
   }
   const css = await read('assets/css/style.css');
   assert.match(css, /--blue: #233DEA;/);
+  assert.match(await read('assets/css/vitrine.css'), /--royal: #233DEA;/);
   assert.doesNotMatch(css, /#FFD400\b/i);
   const html = await read('index.html');
   assert.match(html, /webora-simbolo\.webp/);
