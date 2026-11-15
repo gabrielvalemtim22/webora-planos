@@ -6,7 +6,6 @@
   'use strict';
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
-  const root = document.documentElement;
   const mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
   const reduce = () => mqReduce.matches;
   const W = window.WEBORA, PLANOS = window.PLANOS, C = window.Contrato;
@@ -21,7 +20,6 @@
     del(k) { try { localStorage.removeItem(k); } catch (e) { /* sem armazenamento */ } }
   };
 
-  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('is-ready')));
   $$('[data-wa]').forEach(a => { a.href = wa(a.dataset.wa); });
   $$('[data-year]').forEach(el => { el.textContent = new Date().getFullYear(); });
   $$('[data-preco]').forEach(el => { const P = PLANOS[el.dataset.preco]; if (P) el.textContent = C.brl(P.centavos); });
@@ -53,110 +51,6 @@
   }), { rootMargin: '-45% 0px -50% 0px' });
   $$('main > section[id]').forEach(s => spy.observe(s));
 
-  /* ---------- topo: os projetos em anel, em profundidade, ao redor do título ---------- */
-  (function orbit() {
-    const hero = $('.hero--ring');
-    if (!hero) return;
-    const box = $('.orbit', hero), core = $('[data-orbit-core]', hero);
-    const rings = $$('[data-orbit]', hero).map(el => ({ el, back: el.dataset.orbit === 'back', frames: $$('.orb', el) }));
-    let R = 500, K = .6, persp = 2300, phone = false, spin = 0, last = 0, running = false, mx = 0, my = 0, tmx = 0, tmy = 0;
-
-    // caixas do texto em relação ao centro do anel, medidas sem as transformações da entrada
-    function textBoxes() {
-      const b = box.getBoundingClientRect(), c = core.getBoundingClientRect();
-      const ox = c.left - (b.left + b.width / 2), oy = c.top - (b.top + b.height / 2);
-      return $$('.hero__title .line > span, .hero__lead, .hero__cta > *, .hero__trust li', core).map(e => {
-        let x = 0, y = 0;
-        for (let n = e; n && n !== core; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
-        return [ox + x, oy + y, ox + x + e.offsetWidth, oy + y + e.offsetHeight];
-      });
-    }
-
-    // o card percorre a elipse inteira; em nenhum ponto pode encostar no texto
-    function clears(T, fw, r, v, zA) {
-      for (let i = 0; i < 48; i++) {
-        const a = i / 48 * Math.PI * 2, c = Math.cos(a), sc = persp / (persp - c * r * zA);
-        const x = Math.sin(a) * r, hw = fw * sc / 2 + 14, hh = fw * .625 * sc / 2 + 14;
-        for (const y of [c * v * .95, c * v * 1.05]) {
-          if (T.some(t => x + hw > t[0] && x - hw < t[2] && y + hh > t[1] && y - hh < t[3])) return false;
-        }
-      }
-      return true;
-    }
-
-    function layout() {
-      const W = innerWidth, H = box.clientHeight;
-      phone = W <= 760;
-      persp = (phone ? 2.4 : 1.7) * W;
-      const zA = phone ? .45 : .85, T = textBoxes();
-      const r0 = phone ? .62 * W : Math.min(.4 * W, (H / 2 - 60) / .6), rMax = phone ? .95 * W : .62 * W;
-      // procura o anel mais justo que contorna o texto: primeiro abre para os lados, depois diminui os cards
-      let fit = null;
-      search: for (let fw = (phone ? .44 : .38) * r0; fw >= (phone ? 60 : 96); fw *= .92) {
-        for (let r = r0; r <= rMax; r *= 1.04) {
-          const vMax = H / 2 - fw * .3125 * persp / (persp - r * zA) - 6;
-          for (let v = r * (phone ? .5 : .42); v <= vMax; v += 4) {
-            if (clears(T, fw, r, v, zA)) { fit = [fw, r, v]; break search; }
-          }
-        }
-      }
-      const [fw, r, v] = fit || [phone ? 60 : 96, rMax, H / 2 - (phone ? 30 : 48)];
-      R = r; K = v / r;
-      rings.forEach(g => {
-        g.el.style.perspective = persp + 'px';
-        g.frames.forEach(f => { f.style.width = (g.back ? fw * .62 : fw) + 'px'; });
-      });
-    }
-
-    function place(p) {
-      rings.forEach(r => {
-        const step = 360 / r.frames.length;
-        const rr = R * (r.back ? 1.17 : 1) * (1 + .5 * p);
-        const k = K * (r.back ? .95 : 1) * (1 + my * .05) * (1 - .2 * p);
-        const zA = (phone ? .45 : .85) * (r.back ? .6 : 1);
-        const zoff = p * .55 * R - (r.back ? R * .5 : 0);
-        const base = (r.back ? 15 - spin * .6 : spin) + p * 80 + mx * 8;
-        r.frames.forEach((f, i) => {
-          const a = (i * step + base) * Math.PI / 180, s = Math.sin(a), c = Math.cos(a);
-          const z = c * rr * zA + zoff, back = (persp - z) / persp;
-          f.style.transform = `translate(-50%, -50%) translate3d(${(s * rr * back).toFixed(1)}px, ${(c * rr * k * back).toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${(-s * (r.back ? 14 : 24)).toFixed(1)}deg) rotateX(${(c * 10).toFixed(1)}deg)`;
-          f.style.zIndex = String(Math.round(z + 4000));
-          if (!r.back) f.style.opacity = (.72 + .28 * (c + 1) / 2).toFixed(3);
-        });
-      });
-    }
-
-    const progress = () => {
-      if (reduce()) return 0;
-      const r = hero.getBoundingClientRect();
-      return Math.max(0, Math.min(1, -r.top / r.height));
-    };
-    function tick(t) {
-      if (!running) return;
-      const dt = Math.min(64, t - (last || t)) / 1000;
-      last = t;
-      if (!reduce()) spin += 3 * dt;
-      mx += (tmx - mx) * .06; my += (tmy - my) * .06;
-      place(progress());
-      requestAnimationFrame(tick);
-    }
-    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      hero.addEventListener('pointermove', e => { tmx = e.clientX / innerWidth * 2 - 1; tmy = e.clientY / innerHeight * 2 - 1; });
-      hero.addEventListener('pointerleave', () => { tmx = 0; tmy = 0; });
-    }
-    layout();
-    place(0);
-    addEventListener('resize', () => { layout(); place(progress()); });
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); place(progress()); });
-    new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !running) { running = true; last = 0; requestAnimationFrame(tick); }
-      else if (!e.isIntersecting) running = false;
-    }).observe(hero);
-  })();
-
-  const track = $('.marquee__track');
-  if (track) track.append(...[...track.children].map(n => n.cloneNode(true)));
-
   /* ---------- números ---------- */
   const prazos = LISTA.map(P => P.prazo), prazoMin = Math.min(...prazos), prazoMax = Math.max(...LISTA.map(P => P.prazoMax || P.prazo));
   $$('[data-stat="projetos"]').forEach(el => { el.textContent = PROJETOS.length; });
@@ -170,10 +64,11 @@
   const pfTrack = $('[data-pf-track]');
   pfTrack.innerHTML = PROJETOS.map((p, i) => {
     const P = PLANOS[p.plano];
+    const temCelular = p.imagemCelular && p.imagemCelular !== p.imagem;
     return `<article class="pf__slide" aria-roledescription="slide" aria-label="${i + 1} de ${PROJETOS.length}: ${esc(p.nome)}">
       <div class="pf__media">
-        <div class="laptop"><div class="laptop__screen"><img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)} no computador" width="1280" height="800" loading="${i ? 'lazy' : 'eager'}" decoding="async"></div><div class="laptop__base"></div></div>
-        ${p.imagemCelular ? `<figure class="device pf__phone"><img src="${esc(p.imagemCelular)}" alt="${esc(p.nome)} no celular" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
+        <div class="laptop"><div class="laptop__screen"><img src="${esc(p.imagem)}" alt="Página inicial do site ${esc(p.nome)} no computador" width="1280" height="800" loading="lazy" decoding="async"></div><div class="laptop__base"></div></div>
+        ${temCelular ? `<figure class="device pf__phone"><img src="${esc(p.imagemCelular)}" alt="${esc(p.nome)} no celular" width="450" height="900" loading="lazy" decoding="async"></figure>` : ''}
       </div>
       <div class="pf__body">
         <div class="pf__info">
@@ -248,9 +143,9 @@
   $('[data-plans]').innerHTML = LISTA.map((P, i) => {
     const top = P.id === TOP, extra = Math.max(0, P.destaques.length - VISIVEIS);
     const chamada = P.chamada ? P.chamada.replace('{preco}', C.brl(P.centavos)) : '';
-    const btn = P.destaque ? 'btn--sun' : P.premium ? 'btn--light' : 'btn--glass';
+    const btn = top ? 'btn--white' : 'btn--primary';
     return `<article class="plan plan--${P.id}${top ? ' plan--top' : ''}" data-reveal style="--d:${i * .08}s" aria-labelledby="plano-${P.id}">
-      <div class="plan__top"><span class="plan__n" aria-hidden="true">${numero(i)}</span><span class="plan__badge">${P.premium || top ? icon('spark') : ''}${esc(P.selo)}</span></div>
+      <div class="plan__top"><span class="plan__icon" aria-hidden="true">${icon(P.chaves?.[0]?.icone || 'layout')}</span><span class="plan__badge">${P.premium || top ? icon('spark') : ''}${esc(P.selo)}</span></div>
       <h3 class="plan__name" id="plano-${P.id}">${esc(P.nome)}</h3>
       <p class="plan__desc">${esc(P.descricao)}</p>
       <ul class="plan__keys">${(P.chaves || []).map(k => `<li>${icon(k.icone)}<span>${esc(k.texto)}</span></li>`).join('')}</ul>
@@ -644,7 +539,7 @@
     const x = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
     const badge = $('.done__badge', wiz).getBoundingClientRect();
     const ox = badge.left + badge.width / 2, oy = badge.top + badge.height / 2;
-    const cores = ['#FFD400', '#FFD400', '#FFFFFF', '#FFEC80', '#080808'];
+    const cores = ['#233DEA', '#5674FF', '#FFFFFF', '#ADC1FF', '#080808'];
     const parts = Array.from({ length: 120 }, () => ({ x: ox, y: oy, vx: (Math.random() - .5) * 15, vy: Math.random() * -13 - 3, s: Math.random() * 7 + 3, r: Math.random() * 6, c: cores[Math.floor(Math.random() * cores.length)] }));
     const t0 = performance.now();
     (function tick(t) {

@@ -365,7 +365,7 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
     const M = 16, PW = 210, PH = 297, CW = PW - 2 * M, TOP = 41, BOTTOM = PH - 18;
-    const INK = [17, 18, 20], BODY = [38, 40, 44], MUTED = [96, 104, 118], LINE = [226, 229, 234], BOX = [238, 226, 212], BLUE = [7, 84, 250];
+    const INK = [17, 18, 20], BODY = [38, 40, 44], MUTED = [96, 104, 118], LINE = [226, 229, 234], BOX = [226, 231, 242], BLUE = [35, 61, 234];
     const clean = s => String(s).replace(/[\t  ]/g, ' ').replace(/[–—]/g, '-').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/[•✦✓→]/g, '-');
     const mm = pt => pt * 0.3528;
     const LHF = 1.38;

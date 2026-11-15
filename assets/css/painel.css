@@ -4,7 +4,7 @@
    ========================================================= */
 .pg { min-height: 100vh; background: var(--gray-50); }
 .pg__head { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px var(--gutter); background: #fff; border-bottom: 1px solid var(--border); }
-.pg__brand img { width: 112px; height: auto; }
+.pg__brand img { width: 130px; height: auto; }
 .pg__tag { padding-left: 14px; border-left: 1px solid var(--border); color: var(--gray-600); font-size: 14px; font-weight: 600; }
 .pg__tools { display: flex; gap: 8px; margin-left: auto; }
 .pg__main { width: min(100%, 1180px); margin: 0 auto; padding: clamp(20px, 4vw, 40px) var(--gutter) 64px; }
@@ -92,11 +92,6 @@
 .hist small { color: var(--gray-600); }
 .ok-tag { color: #1E6B3A; font-weight: 700; }
 .warn-tag { color: #8A5A00; font-weight: 700; }
-
-/* Marca amarela, textos de ação legíveis sobre as telas claras. */
-.btn--light:hover { color: var(--black); border-color: var(--blue); }
-.kv a { color: var(--black); text-decoration-color: var(--blue); }
-.pg__brand img { display: block; }
 
 @media (max-width: 900px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }

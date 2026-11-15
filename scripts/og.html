@@ -1,45 +1,29 @@
 <!doctype html>
-<!-- Modelo da imagem de compartilhamento (1200×630). Gerada por: node scripts/marca.mjs -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=block">
+<title>Webora. Do clique ao cliente.</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  html, body { width: 1200px; height: 630px; overflow: hidden; }
-  body { position: relative; background: #fff; color: #080808; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; padding: 60px 72px; }
-  .geo { position: absolute; right: -120px; top: -110px; width: 640px; height: 860px; }
-  .brand { position: relative; display: flex; align-items: center; gap: 16px; }
-  .brand img:first-child { width: 62px; height: 62px; }
-  .brand img:last-child { height: 40px; width: auto; }
-  .eyebrow { position: relative; display: flex; align-items: center; gap: 16px; margin-top: 64px; color: #4B5261; font-size: 18px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; }
-  .eyebrow::after { content: ''; width: 56px; height: 2px; background: #0754FA; }
-  h1 { position: relative; margin-top: 18px; max-width: 760px; font-size: 84px; line-height: .98; font-weight: 800; letter-spacing: -.05em; }
-  h1 span { color: #0754FA; }
-  h1 i { font-style: normal; margin-left: -.07em; }
-  .foot { position: absolute; left: 72px; right: 72px; bottom: 54px; display: flex; align-items: center; justify-content: space-between; }
-  .chips { display: flex; gap: 12px; }
-  .chips span { padding: 11px 20px; border-radius: 12px; border: 1px solid #E3E7EF; background: #fff; font-size: 20px; font-weight: 600; color: #1A1D23; box-shadow: 0 10px 24px -18px rgba(7, 84, 250, .5); }
-  .chips span b { color: #0754FA; font-weight: 800; margin-right: 8px; }
-  .url { padding: 12px 22px; border-radius: 12px; background: #0754FA; color: #fff; font-size: 21px; font-weight: 700; letter-spacing: .02em; }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 1200px; height: 630px; display: grid; grid-template-columns: 1fr 450px; align-items: center; gap: 48px; padding: 64px; background: #f9faff; color: #080808; font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; }
+  .brand { display: flex; align-items: center; gap: 15px; }
+  .brand img:first-child { border-radius: 13px; }
+  h1 { margin: 38px 0 24px; font-size: 78px; font-weight: 800; letter-spacing: -.08em; line-height: .98; }
+  h1 span { display: block; color: #233dea; }
+  p { margin: 0; color: #4b5369; font-size: 25px; font-weight: 600; }
+  .tile { display: block; width: 100%; height: auto; border-radius: 34px; box-shadow: 0 24px 54px rgba(30, 53, 204, .25); }
 </style>
 </head>
 <body>
-  <svg class="geo" viewBox="0 0 640 860" fill="none" aria-hidden="true">
-    <path d="M360 40 620 190v300L360 640 100 490V190Z" fill="#0754FA" opacity=".08"/>
-    <path d="M430 150 640 271v242L430 634 220 513V271Z" fill="#0754FA" opacity=".14"/>
-    <path d="M500 300 640 381v162L500 624 360 543V381Z" fill="#0754FA"/>
-    <path d="M360 40 620 190v300L360 640 100 490V190Z" stroke="#0754FA" stroke-opacity=".35" stroke-width="2"/>
-  </svg>
-  <div class="brand">
-    <img src="../assets/img/marca/webora-simbolo.webp" alt="">
-    <img src="../assets/img/marca/webora-logotipo-preto.webp" alt="">
+  <div>
+    <div class="brand">
+      <img src="../assets/img/marca/webora-simbolo.webp" width="58" height="58" alt="">
+      <img src="../assets/img/marca/webora-logotipo-preto.webp" width="130" height="29" alt="Webora">
+    </div>
+    <h1>Do clique <span>ao cliente.</span></h1>
+    <p>Sites profissionais, lojas online e landing pages.</p>
   </div>
-  <p class="eyebrow">Sites profissionais</p>
-  <h1>Sua marca merece um site <span>extraordinário<i>.</i></span></h1>
-  <div class="foot">
-    <div class="chips"><span><b>✓</b>Projetos reais no ar</span><span><b>✓</b>Pagamento único</span><span><b>✓</b>Contrato online</span></div>
-    <span class="url">weborasites.com.br</span>
-  </div>
+  <img class="tile" src="../assets/img/marca/webora-royal-lockup.webp" width="520" height="520" alt="">
 </body>
 </html>

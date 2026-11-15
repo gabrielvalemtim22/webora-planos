@@ -2,7 +2,7 @@
 
 Site da **Webora** (https://www.weborasites.com.br) com o **portfólio** de projetos publicados e os planos **Essencial (R$ 599,99)**, **Loja Online (R$ 599,99)** e **Sites de 10 Mil Profissionais (R$ 999,99)**, todos em pagamento único, sem mensalidade da Webora. O cliente escolhe o plano, preenche os dados, lê e **assina o contrato online** (assinatura desenhada), recebe o **QR Code Pix** com o valor exato, baixa o **contrato em PDF** e envia tudo para a Webora pelo WhatsApp.
 
-Identidade: azul royal `#0754FA`, preto `#080808` e branco, com cinza claro `#F4F6FA`, azul claro `#F0F5FF` e bordas `#E3E7EF`. Sobre o preto, textos pequenos em azul usam `#3D78FF` (contraste 5,1:1). Fonte Plus Jakarta Sans. Formas geométricas em hexágono, como o símbolo.
+Identidade: azul royal #233DEA, preto #080808, branco e superfícies claras em #F6F8FC. Fonte Plus Jakarta Sans. O símbolo tem uma janela com cursor apoiada por duas mãos.
 
 Ofertas: cada plano mostra os selos "Oferta especial", "Preço único" e "Sem mensalidade da Webora"; o premium destaca "Seu projeto de alto padrão por R$ 999,99." (`chamada` no `config.js`). O site não mostra preço "de" nem contador de urgência.
 
@@ -38,7 +38,7 @@ assets/js/config.js        dados da Webora, dos planos e dos projetos (edite aqu
 assets/js/contrato.js      contrato, valores, validação, Pix e PDF (navegador e servidor)
 assets/js/app.js           página, vitrine, planos, comparação e assistente de contratação
 api/contrato.js            conferência do contrato no servidor (Vercel Function)
-assets/img/marca/          símbolo (quadrado azul com o hexágono) e logotipo (azul+preto e azul+branco)
+assets/img/marca/          símbolo, logotipo preto e branco, arte royal e assinatura do PDF
 favicon.ico, icon*.png     ícones da aba, do app e do iPhone (apple-icon.png)
 marca/                     imagens originais da marca enviadas pela Webora (não vão para o site)
 scripts/                   servidor local, gerador da marca e modelo da imagem de compartilhamento

@@ -1,167 +1,89 @@
-/* =========================================================
-   Webora — gera os arquivos da marca a partir das imagens originais
-   (marca/webora-simbolo-original.jpg: símbolo sobre fundo azul;
-    marca/webora-logotipo-original.webp: "web" azul + "ora" preto sobre branco).
-
-   As cores são normalizadas para as oficiais (azul royal #0754FA, preto #080808 e branco),
-   sem mudar o desenho.
-
-   Saída:
-     assets/img/marca/   símbolo (quadrado azul com o hexágono) e logotipo (preto: fundo claro;
-                         branco: fundo escuro), PNG do logotipo para o PDF
-     favicon.ico, icon.png, icon-192.png, icon-maskable.png, apple-icon.png   (raiz do site)
-     assets/img/og.jpg   imagem de compartilhamento (1200×630), a partir de scripts/og.html
-
-   Usa o Chrome (ou Edge) instalado, sem dependências: npm run marca
-   ========================================================= */
+/* Gera os ícones, as assinaturas e a imagem de compartilhamento da Webora
+   a partir das duas imagens fornecidas em marca/. Usa o Chrome instalado. */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { launch } from './chrome.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const BLUE = [0x07, 0x54, 0xFA];
-const BLACK = [0x08, 0x08, 0x08];
 
-/* ---------- processamento das imagens (roda dentro do Chrome) ---------- */
-async function processar({ simbolo, logotipo, blue, black }) {
-  const load = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('imagem')); i.src = src; });
-  const canvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
-  const read = img => { const c = canvas(img.width, img.height), x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(img, 0, 0); return x.getImageData(0, 0, c.width, c.height); };
-  const toCanvas = data => { const c = canvas(data.width, data.height); c.getContext('2d').putImageData(data, 0, 0); return c; };
-  const bbox = (data, test) => {
-    const { width: W, height: H, data: d } = data; let x0 = W, y0 = H, x1 = -1, y1 = -1;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (test(d, (y * W + x) * 4)) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-    return { x0, y0, x1, y1, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+async function processar({ simbolo, logotipo }) {
+  const load = async src => {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    return img;
   };
-  // redução em etapas (metade por vez) para manter as bordas nítidas
-  const resize = (src, w, h) => {
-    let cur = src;
-    while (cur.width / 2 > w && cur.height / 2 > h) {
-      const n = canvas(Math.round(cur.width / 2), Math.round(cur.height / 2)), x = n.getContext('2d');
-      x.imageSmoothingQuality = 'high'; x.drawImage(cur, 0, 0, n.width, n.height); cur = n;
-    }
-    const out = canvas(w, h), x = out.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(cur, 0, 0, w, h);
+  const canvas = (width, height) => {
+    const out = document.createElement('canvas');
+    out.width = width;
+    out.height = height;
     return out;
   };
-  const url = (c, type = 'image/png', q) => c.toDataURL(type, q);
-  const hex = c => `rgb(${c.join(',')})`;
+  const [mark, lockup] = await Promise.all([load(simbolo), load(logotipo)]);
+  const blue = '#1022dd';
 
-  /* símbolo: cada pixel é uma mistura de azul (fundo), branco e preto.
-     Os pesos saem de mínimos quadrados e recompõem o pixel com as cores oficiais. */
-  const s = read(await load(simbolo)), W = s.width, H = s.height, d = s.data;
-  const bg = [0, 0, 0];
-  for (let y = 8; y < 48; y++) for (let x = 8; x < 48; x++) { const i = (y * W + x) * 4; bg[0] += d[i]; bg[1] += d[i + 1]; bg[2] += d[i + 2]; }
-  bg.forEach((v, k) => { bg[k] = v / 1600; });
-  const Wv = [255, 255, 255];
-  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-  const a11 = dot(bg, bg), a12 = dot(bg, Wv), a22 = dot(Wv, Wv), det = a11 * a22 - a12 * a12;
-  const wB = new Float32Array(W * H), wW = new Float32Array(W * H);
-  for (let p = 0; p < W * H; p++) {
-    const px = [d[p * 4], d[p * 4 + 1], d[p * 4 + 2]], b1 = dot(bg, px), b2 = dot(Wv, px);
-    let wb = Math.max(0, (a22 * b1 - a12 * b2) / det), ww = Math.max(0, (a11 * b2 - a12 * b1) / det);
-    const t = wb + ww; if (t > 1) { wb /= t; ww /= t; }
-    wB[p] = wb; wW[p] = ww;
-  }
-  // fundo azul: tudo o que é azul e encosta na borda da imagem
-  const outside = new Uint8Array(W * H), stack = [];
-  for (let x = 0; x < W; x++) stack.push(x, (H - 1) * W + x);
-  for (let y = 0; y < H; y++) stack.push(y * W, y * W + W - 1);
-  while (stack.length) {
-    const p = stack.pop();
-    if (outside[p] || wB[p] < .5) continue;
-    outside[p] = 1;
-    const x = p % W, y = (p - x) / W;
-    if (x > 0) stack.push(p - 1); if (x < W - 1) stack.push(p + 1);
-    if (y > 0) stack.push(p - W); if (y < H - 1) stack.push(p + W);
-  }
-  // o emblema é a maior região que não é fundo; pontos soltos (ruído do JPEG) viram fundo
-  const comp = new Int32Array(W * H).fill(-1), sizes = [];
-  for (let p0 = 0; p0 < W * H; p0++) {
-    if (outside[p0] || comp[p0] >= 0) continue;
-    const id = sizes.length; let n = 0; stack.push(p0); comp[p0] = id;
-    while (stack.length) {
-      const p = stack.pop(); n++;
-      const x = p % W, y = (p - x) / W;
-      for (const q of [x > 0 ? p - 1 : -1, x < W - 1 ? p + 1 : -1, y > 0 ? p - W : -1, y < H - 1 ? p + W : -1]) if (q >= 0 && !outside[q] && comp[q] < 0) { comp[q] = id; stack.push(q); }
-    }
-    sizes.push(n);
-  }
-  const maior = sizes.indexOf(Math.max(...sizes));
-  const soltos = sizes.filter((n, i) => i !== maior);
-  for (let p = 0; p < W * H; p++) if (!outside[p] && comp[p] !== maior) { outside[p] = 1; wB[p] = 1; wW[p] = 0; }
-  // borda suavizada: só os 3 px de cada lado do contorno do emblema têm transparência parcial;
-  // o resto do fundo fica transparente (a borda da imagem original é um pouco mais escura)
-  const grow = (mask, n) => {
-    const m = mask.slice();
-    for (let k = 0; k < n; k++) {
-      const prev = m.slice();
-      for (let p = 0; p < W * H; p++) if (!prev[p]) {
-        const x = p % W;
-        if ((x > 0 && prev[p - 1]) || (x < W - 1 && prev[p + 1]) || (p >= W && prev[p - W]) || (p < W * (H - 1) && prev[p + W])) m[p] = 1;
-      }
-    }
-    return m;
-  };
-  const perto = grow(outside.map(v => 1 - v), 3), borda = grow(outside, 3);
-  const em = new ImageData(W, H), e = em.data;
-  for (let p = 0; p < W * H; p++) {
-    const ww = wW[p], wk = Math.max(0, 1 - wB[p] - ww), tot = ww + wk, i = p * 4;
-    const a = outside[p] ? (perto[p] ? tot : 0) : (borda[p] ? tot : 1);
-    const f = tot > .001 ? ww / tot : 1;              // fração de branco no que não é azul
-    e[i] = Math.round(255 * f + black[0] * (1 - f)); e[i + 1] = Math.round(255 * f + black[1] * (1 - f)); e[i + 2] = Math.round(255 * f + black[2] * (1 - f));
-    e[i + 3] = a < .04 ? 0 : Math.round(Math.min(1, a) * 255);
-  }
-  const eb = bbox(em, (dd, i) => dd[i + 3] > 8);
-
-  // símbolo e ícones: o desenho original (emblema sobre o quadrado azul), com cantos
-  // arredondados no site, na aba e no app, ou inteiro onde o sistema arredonda (iPhone, Android)
-  const tile = (size, scale, raio) => {
-    const out = canvas(size, size), x = out.getContext('2d');
-    x.fillStyle = hex(blue);
-    if (raio) { x.beginPath(); x.roundRect(0, 0, size, size, size * raio); x.fill(); } else x.fillRect(0, 0, size, size);
-    const ebW = Math.round(size * scale), crop = canvas(eb.w, eb.h);
-    crop.getContext('2d').drawImage(toCanvas(em), eb.x0, eb.y0, eb.w, eb.h, 0, 0, eb.w, eb.h);
-    const r = resize(crop, ebW, Math.round(ebW * eb.h / eb.w));
-    x.drawImage(r, Math.round((size - r.width) / 2), Math.round((size - r.height) / 2));
+  // Mantém a arte da janela e das mãos inteira, com mais respiro nos ícones
+  // que podem receber uma máscara circular do sistema operacional.
+  const tile = (size, padding = 0) => {
+    const out = canvas(size, size);
+    const ctx = out.getContext('2d');
+    const crop = mark.width * .9;
+    ctx.fillStyle = blue;
+    ctx.fillRect(0, 0, size, size);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(mark, (mark.width - crop) / 2, (mark.height - crop) / 2, crop, crop,
+      padding * size, padding * size, (1 - padding * 2) * size, (1 - padding * 2) * size);
     return out;
   };
 
-  /* logotipo: separa do fundo branco (alfa pelo canal vermelho) e normaliza as cores */
-  const l = read(await load(logotipo)), ld = l.data;
-  const azul = new Uint8Array(ld.length / 4);
-  for (let i = 0, p = 0; i < ld.length; i += 4, p++) {
-    const r = ld[i], b = ld[i + 2], falta = 255 - r;
-    const a = falta / 248;
-    if (a < .05) { ld[i + 3] = 0; continue; }
-    azul[p] = (b - r) > falta * .5 ? 1 : 0;
-    const c = azul[p] ? blue : black;
-    ld[i] = c[0]; ld[i + 1] = c[1]; ld[i + 2] = c[2]; ld[i + 3] = Math.round(Math.min(1, a) * 255);
-  }
-  const lb = bbox(l, (dd, i) => dd[i + 3] > 40);
-  const pad = Math.round(lb.h * .04);
-  const lw = lb.w + pad * 2, lh = lb.h + pad * 2;
-  const logoPreto = canvas(lw, lh);
-  logoPreto.getContext('2d').drawImage(toCanvas(l), lb.x0, lb.y0, lb.w, lb.h, pad, pad, lb.w, lb.h);
-  const pd = logoPreto.getContext('2d').getImageData(0, 0, lw, lh);
-  for (let i = 0; i < pd.data.length; i += 4) if (pd.data[i] === black[0] && pd.data[i + 2] === black[2]) { pd.data[i] = 255; pd.data[i + 1] = 255; pd.data[i + 2] = 255; }
-  const logoBranco = toCanvas(pd);
-  const logoW = 560, logoH = Math.round(560 * lh / lw);
+  // A palavra branca do original é isolada pelo canal vermelho, quase
+  // ausente no fundo royal. O alfa mantém as bordas suavizadas da fonte.
+  const wordmark = (w, color) => {
+    const out = canvas(w, Math.round(w * .225));
+    const ctx = out.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(lockup, lockup.width * .121, lockup.height * .594, lockup.width * .758, lockup.height * .171,
+      0, 0, out.width, out.height);
+    const pixels = ctx.getImageData(0, 0, out.width, out.height);
+    for (let i = 0; i < pixels.data.length; i += 4) {
+      const red = pixels.data[i];
+      pixels.data.fill(color, i, i + 3);
+      pixels.data[i + 3] = Math.max(0, Math.min(255, Math.round((red - 13) * 255 / 233)));
+    }
+    ctx.putImageData(pixels, 0, 0);
+    return out;
+  };
 
-  const ico = [16, 32, 48].map(n => ({ size: n, png: url(tile(n, .8, .22)) }));
+  const paper = canvas(440, 112);
+  const paperCtx = paper.getContext('2d');
+  paperCtx.fillStyle = '#fff';
+  paperCtx.fillRect(0, 0, paper.width, paper.height);
+  paperCtx.save();
+  paperCtx.beginPath();
+  paperCtx.roundRect(4, 6, 100, 100, 23);
+  paperCtx.clip();
+  paperCtx.drawImage(tile(100), 4, 6);
+  paperCtx.restore();
+  paperCtx.drawImage(wordmark(306, 8), 125, 22);
+
+  const square = canvas(520, 520);
+  const squareCtx = square.getContext('2d');
+  squareCtx.imageSmoothingQuality = 'high';
+  squareCtx.drawImage(lockup, 0, 0, 520, 520);
+  const webp = (img, quality = .91) => img.toDataURL('image/webp', quality);
+
   return {
-    fundo: bg.map(Math.round),
-    soltos: soltos.length ? `${soltos.length} (maior: ${Math.max(...soltos)} px)` : '0',
-    ratio: lw / lh,
-    simbolo: url(tile(192, .66, .22), 'image/webp', .92),
-    icon512: url(tile(512, .66, .22)),
-    icon192: url(tile(192, .68, .22)),
-    maskable: url(tile(512, .54, 0)),
-    apple: url(tile(180, .62, 0)),
-    ico,
-    logoPreto: url(resize(logoPreto, logoW, logoH), 'image/webp', .92),
-    logoBranco: url(resize(logoBranco, logoW, logoH), 'image/webp', .92),
-    logoPdf: url(resize(logoPreto, 420, Math.round(420 * lh / lw)))
+    simbolo: webp(tile(192)),
+    icon512: tile(512).toDataURL(),
+    icon192: tile(192).toDataURL(),
+    maskable: tile(512, .16).toDataURL(),
+    apple: tile(180).toDataURL(),
+    ico: [16, 32, 48].map(size => ({ size, png: tile(size).toDataURL() })),
+    logoPreto: webp(wordmark(560, 8)),
+    logoBranco: webp(wordmark(560, 255)),
+    logoPdf: paper.toDataURL(),
+    lockup: webp(square)
   };
 }
 
@@ -189,10 +111,8 @@ try {
   console.log('Marca Webora');
   const r = await chrome.evaluate(processar.toString(), {
     simbolo: await dataURL('marca/webora-simbolo-original.jpg', 'image/jpeg'),
-    logotipo: await dataURL('marca/webora-logotipo-original.webp', 'image/webp'),
-    blue: BLUE, black: BLACK
+    logotipo: await dataURL('marca/webora-logotipo-original.webp', 'image/webp')
   });
-  console.log(`  azul do original: rgb(${r.fundo.join(', ')}) → #0754FA · pontos soltos removidos: ${r.soltos}`);
   await out('assets/img/marca/webora-simbolo.webp', fromDataURL(r.simbolo));
   await out('assets/img/marca/webora-logotipo-preto.webp', fromDataURL(r.logoPreto));
   await out('assets/img/marca/webora-logotipo-branco.webp', fromDataURL(r.logoBranco));
@@ -202,8 +122,7 @@ try {
   await out('icon-maskable.png', fromDataURL(r.maskable));
   await out('apple-icon.png', fromDataURL(r.apple));
   await out('favicon.ico', ico(r.ico.map(i => ({ size: i.size, buf: fromDataURL(i.png) }))));
-  console.log(`  proporção do logotipo: ${r.ratio.toFixed(4)} (largura/altura)`);
-
+  await out('assets/img/marca/webora-royal-lockup.webp', fromDataURL(r.lockup));
   // imagem de compartilhamento
   await chrome.send('Page.enable');
   await chrome.send('Emulation.setDeviceMetricsOverride', { width: 1200, height: 630, deviceScaleFactor: 1, mobile: false });

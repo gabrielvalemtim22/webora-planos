@@ -24,7 +24,7 @@
     }
     return libsP;
   }
-  const logo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=6')
+  const logo = () => logoP || (logoP = fetch('/assets/img/marca/webora-logotipo.png?v=10')
     .then(r => (r.ok ? r.blob() : Promise.reject(new Error('logo'))))
     .then(b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); }))
     .then(async data => { const img = new Image(); img.src = data; await img.decode(); return { data, ratio: img.naturalWidth / img.naturalHeight }; })

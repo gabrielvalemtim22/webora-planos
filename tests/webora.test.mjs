@@ -151,7 +151,7 @@ test('textos estáticos do index.html acompanham config.js', async () => {
   assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
 });
 
-test('identidade amarela, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
+test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
   const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/js/app.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
   for (const f of files) {
     const s = await read(f);
@@ -162,19 +162,22 @@ test('identidade amarela, preta e branca: sem o verde-neon, preços antigos ou u
     assert.ok(!/últimas horas|vai esgotar|nunca mais/i.test(s), `urgência falsa em ${f}`);
     assert.ok(!/webora-planos\.vercel\.app/.test(s), `domínio antigo em ${f}`);
   }
-  assert.match(await read('assets/css/style.css'), /--blue: #FFD400;/);
+  const css = await read('assets/css/style.css');
+  assert.match(css, /--blue: #233DEA;/);
+  assert.doesNotMatch(css, /#FFD400\b/i);
   const html = await read('index.html');
-  assert.match(html, /webora-2026-icon\.jpg/);
-  assert.match(html, /webora-2026-wordmark\.png/);
-  // abertura em filme 3D: vídeo do computador, do celular e o primeiro quadro
-  assert.match(html, /data-src="\/assets\/3d\/webora-3d\.mp4/);
-  assert.match(html, /data-src-mobile="\/assets\/3d\/webora-3d-m\.mp4/);
-  assert.match(html, /assets\/3d\/cine-poster\.webp/);
-  assert.match(html, /media-src 'self' blob:/);
-  const img = await readdir(path.join(ROOT, 'assets/img'));
-  assert.ok(!img.includes('webora-mark.webp') && !img.includes('favicon-48.png'), 'logo/ícones antigos removidos');
+  assert.match(html, /webora-simbolo\.webp/);
+  assert.match(html, /webora-logotipo-preto\.webp/);
+  assert.match(html, /webora-royal-lockup\.webp/);
+  assert.match(html, /class="hero-art__browser"/);
+  assert.match(html, /class="device hero-art__phone"/);
+  const manifest = JSON.parse(await read('site.webmanifest'));
+  assert.ok(manifest.icons.some(icon => icon.purpose === 'maskable'));
+  for (const icon of manifest.icons) await assert.doesNotReject(readFile(path.join(ROOT, icon.src.split('?')[0])));
   const marca = await readdir(path.join(ROOT, 'assets/img/marca'));
-  assert.deepEqual(marca.sort(), ['webora-2026-icon.jpg', 'webora-2026-wordmark.png', 'webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-simbolo.webp']);
+  for (const name of ['webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-royal-lockup.webp', 'webora-simbolo.webp']) {
+    assert.ok(marca.includes(name), name);
+  }
 });
 
 /* ---------- api/contrato.js ---------- */
