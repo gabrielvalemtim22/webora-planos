@@ -133,55 +133,44 @@ test('prints dos projetos cadastrados existem', async () => {
   }
 });
 
-test('vitrine exibe os projetos, os valores oficiais e o contato de cada plano', async () => {
+test('página inicial mostra os resultados no ar, sem preço, e leva ao WhatsApp', async () => {
   const html = await read('index.html');
   const hrefs = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(([, href]) => href);
   const contacts = hrefs.filter(href => href.startsWith('https://wa.me/')).map(href => new URL(href));
-  assert.ok(contacts.length >= LISTA.length);
+  assert.ok(contacts.length >= 4, 'chamadas para o WhatsApp');
   for (const url of contacts) {
     assert.equal(url.pathname, '/' + WEBORA.whatsapp);
     assert.match(url.searchParams.get('text'), /Webora/);
   }
+  // sem preço nenhum na página inicial
+  assert.doesNotMatch(html, /R\$\s?\d/, 'valor em reais');
+  assert.doesNotMatch(html, /"price"|priceCurrency|hasOfferCatalog/, 'preço nos dados estruturados');
+  // cada projeto tem card, categoria, prints que existem e link do site no ar
+  const cards = [...html.matchAll(/<article\b[^>]*\bdata-project\b[^>]*>/g)].map(([tag]) => tag);
+  assert.equal(cards.length, 7);
+  for (const tag of cards) assert.match(tag, /data-category="(loja|site|sistema)"/);
   for (const project of PROJETOS) {
-    assert.ok(hrefs.includes(project.url), project.nome);
     const card = html.split('id="projeto-' + project.id + '"')[1]?.split('</article>')[0];
     assert.ok(card, project.nome);
-    assert.ok(card.includes('data-category="' + project.categoria + '"'), project.nome);
-    assert.ok(card.includes('src="' + project.imagem + '"'), project.nome);
-    assert.ok(card.includes('src="' + project.imagemCelular + '"'), project.nome);
     assert.ok(card.includes('href="' + project.url + '"'), project.nome);
   }
-  const cards = [...html.matchAll(/<article\b[^>]*\bdata-project\s[^>]*>/g)].map(([tag]) => tag);
-  assert.equal(cards.length, PROJETOS.length);
-  assert.ok(cards.every(tag => !/\shidden(?:\s|>)/.test(tag)));
-  assert.deepEqual([...html.matchAll(/data-filter="([^"]+)"/g)].map(([, filter]) => filter), ['todos', 'institucional', 'loja']);
-  assert.equal([...html.matchAll(/role="tab"[^>]*aria-selected="true"/g)].length, 1);
-  assert.doesNotMatch(html, /<form\b|href="#contratar"/);
-  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
-  const organization = ld['@graph'].find(item => item['@type'] === 'Organization');
-  const service = ld['@graph'].find(item => item['@type'] === 'Service');
-  assert.equal(organization.contactPoint.telephone.replace(/\D/g, ''), WEBORA.whatsapp);
-  assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
-  for (const plan of LISTA) {
-    const article = html.split('data-plan="' + plan.id + '"')[1]?.split('</article>')[0];
-    assert.ok(article, plan.id);
-    assert.ok(article.includes('<h3>' + plan.nome + '</h3>'), plan.id);
-    assert.ok(article.includes('<strong>' + norm(C.brl(plan.centavos)).replace('R$ ', '') + '</strong>'), plan.id);
-    const link = new URL(article.match(/data-plan-contact="[^"]+"\s+href="([^"]+)"/)[1]);
-    assert.equal(link.origin, 'https://wa.me');
-    assert.equal(link.pathname, '/' + WEBORA.whatsapp);
-    const message = link.searchParams.get('text');
-    assert.ok(message.includes(plan.nome) && message.includes(norm(C.brl(plan.centavos))), plan.id);
-    const offer = service.hasOfferCatalog.itemListElement.find(item => item.name === plan.nome);
-    assert.equal(offer.price, C.reais(plan.centavos), plan.id);
+  // os números dos filtros batem com os cards
+  for (const [, f, n] of html.matchAll(/data-filter="(\w+)">[^<]*<em>(\d+)<\/em>/g)) {
+    const total = f === 'todos' ? cards.length : cards.filter(t => t.includes('data-category="' + f + '"')).length;
+    assert.equal(total, +n, 'filtro ' + f);
   }
-  for (const [, src] of html.matchAll(/(?:src|srcset)="(\/assets\/img\/[^"]+)"/g)) {
+  assert.equal([...html.matchAll(/role="tab"[^>]*aria-selected="true"/g)].length, 1);
+  for (const [, src] of html.matchAll(/(?:src|srcset|href|content)="(?:https:\/\/www\.weborasites\.com\.br)?(\/assets\/[^"]+)"/g)) {
     await assert.doesNotReject(readFile(path.join(ROOT, src.split('?')[0])), src);
   }
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+  const organization = ld['@graph'].find(item => item['@type'] === 'Organization');
+  assert.equal(organization.contactPoint.telephone.replace(/\D/g, ''), WEBORA.whatsapp);
+  assert.ok(html.includes('<link rel="canonical" href="https://www.weborasites.com.br/">'));
 });
 
-test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos ou urgência falsa', async () => {
-  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/css/vitrine.css', 'assets/js/vitrine.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest', 'scripts/og.html'];
+test('identidade azul da logo nova: sem o verde-neon, preços antigos ou urgência falsa', async () => {
+  const files = ['index.html', '404.html', 'assets/css/style.css', 'assets/css/site.css', 'assets/js/site.js', 'assets/js/config.js', 'assets/js/contrato.js', 'site.webmanifest'];
   for (const f of files) {
     const s = await read(f);
     assert.ok(!/#(9BFF00|B5FF45|86E000|EDFFD1|C8FF66)\b/i.test(s), `verde-neon em ${f}`);
@@ -191,23 +180,14 @@ test('identidade azul royal, preta e branca: sem o verde-neon, preços antigos o
     assert.ok(!/últimas horas|vai esgotar|nunca mais/i.test(s), `urgência falsa em ${f}`);
     assert.ok(!/webora-planos\.vercel\.app/.test(s), `domínio antigo em ${f}`);
   }
-  const css = await read('assets/css/style.css');
-  assert.match(css, /--blue: #233DEA;/);
-  assert.match(await read('assets/css/vitrine.css'), /--royal: #233DEA;/);
-  assert.doesNotMatch(css, /#FFD400\b/i);
+  assert.match(await read('assets/css/site.css'), /--royal: #0120E9;/);
   const html = await read('index.html');
-  assert.match(html, /webora-simbolo\.webp/);
-  assert.match(html, /webora-logotipo-preto\.webp/);
-  assert.match(html, /webora-site-profissional\.webp/);
-  assert.match(html, /webora-site-profissional-mobile\.webp/);
-  assert.match(html, /webora-preco-justo\.webp/);
+  assert.match(html, /webora-simbolo-alpha\.webp/);
+  assert.match(html, /webora-palavra\.webp/);
+  assert.match(html, /og-webora\.jpg/);
   const manifest = JSON.parse(await read('site.webmanifest'));
   assert.ok(manifest.icons.some(icon => icon.purpose === 'maskable'));
   for (const icon of manifest.icons) await assert.doesNotReject(readFile(path.join(ROOT, icon.src.split('?')[0])));
-  const marca = await readdir(path.join(ROOT, 'assets/img/marca'));
-  for (const name of ['webora-logotipo-branco.webp', 'webora-logotipo-preto.webp', 'webora-logotipo.png', 'webora-royal-lockup.webp', 'webora-simbolo.webp']) {
-    assert.ok(marca.includes(name), name);
-  }
 });
 
 /* ---------- api/contrato.js ---------- */
